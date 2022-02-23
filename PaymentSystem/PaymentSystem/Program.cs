@@ -22,6 +22,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<RolesService>();
+builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 
 
 var app = builder.Build();

@@ -6,11 +6,13 @@ namespace PaymentSystem.Services;
 
 public class AuthService
 {
-    private readonly IAuthRepository _authRepository;  
+    private readonly IAuthRepository _authRepository;
+    private readonly RolesService _rolesService;
     
-    public AuthService(IAuthRepository authRepository)
+    public AuthService(IAuthRepository authRepository, RolesService rolesService)
     {
         _authRepository = authRepository;
+        _rolesService = rolesService;
     }
 
     public async Task<UserRecord?> GetUserById(int userId)
@@ -31,6 +33,7 @@ public class AuthService
         };
         
         var userId = await _authRepository.CreateUser(newUser);
+        await _rolesService.AddUserRole(userId, 1);
         return userId;
     }
     
