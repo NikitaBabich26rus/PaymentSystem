@@ -5,13 +5,13 @@ namespace PaymentSystem.Repositories;
 public interface IAuthRepository
 {
 
-    Task<User?> GetUserByEmail(string email);
+    Task<UserRecord?> GetUserByEmail(string email);
     
-    Task<User?> GetUserById(int userId);
+    Task<UserRecord?> GetUserById(int userId);
     
-    Task<int> CreateUser(User user);
+    Task<int> CreateUser(UserRecord userRecord);
     
-    Task DeleteUser(User user);
+    Task DeleteUser(UserRecord userRecord);
     
-    Task UpdateUser(User user);  
+    Task UpdateUser(UserRecord userRecord);  
 }

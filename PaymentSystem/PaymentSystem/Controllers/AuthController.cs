@@ -7,7 +7,6 @@ using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
 
-[Route("api/auth")]
 public class AuthController: Controller
 {
     private readonly AuthService _authService;
@@ -17,7 +16,8 @@ public class AuthController: Controller
         _authService = authService;
     }
     
-    [HttpPost("sign-in")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginModel loginModel)
     {
         if (ModelState.IsValid)
@@ -25,17 +25,17 @@ public class AuthController: Controller
             var user = await _authService.GetUserByEmail(loginModel.Email);
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest("User not found");
             }
             
             await AddCookie(user.Id);
-            return Ok();
+            return Redirect("/");
         }
         
-        return BadRequest();
+        return BadRequest("Error model");
     }
 
-    [HttpPost("sign-up")]
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterModel registerModel)
     {
@@ -44,23 +44,21 @@ public class AuthController: Controller
             var user = await _authService.GetUserByEmail(registerModel.Email);
             if (user != null)
             {
-                return BadRequest();
+                return BadRequest("Email is used");
             }
             
             var userId = await _authService.CreateUser(registerModel);
             await AddCookie(userId);
-            return Ok();
+            return Redirect("/");
         }
         
-        return BadRequest();
+        return BadRequest("Error model");
     }
     
-    [HttpGet("logout")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await DeleteCookie();
-        return Ok();
+        return Redirect("/");
     }
 
     private async Task DeleteCookie()

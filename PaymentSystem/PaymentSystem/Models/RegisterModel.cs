@@ -19,6 +19,6 @@ public class RegisterModel
     public string Password { get; set; }
          
     [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Пароль введен неверно")]
+    [Compare("Password", ErrorMessage = "Неверное подтверждение пароля")]
     public string ConfirmPassword { get; set; }
 }

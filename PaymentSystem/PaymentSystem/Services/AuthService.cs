@@ -13,29 +13,30 @@ public class AuthService
         _authRepository = authRepository;
     }
 
-    public async Task<User?> GetUserById(int userId)
+    public async Task<UserRecord?> GetUserById(int userId)
         => await _authRepository.GetUserById(userId);
 
-    public async Task<User?> GetUserByEmail(string email)
+    public async Task<UserRecord?> GetUserByEmail(string email)
         => await _authRepository.GetUserByEmail(email);
     
     public async Task<int> CreateUser(RegisterModel registerModel)
     {
-        var newUser = new User()
+        var newUser = new UserRecord()
         {
             FirstName = registerModel.FirstName,
             LastName = registerModel.LastName,
             Email = registerModel.Email,
             Password = registerModel.Password,
-            RegisteredAt = DateTime.Now
+            RegisteredAt = DateTime.UtcNow
         };
         
-        return await _authRepository.CreateUser(newUser);
+        var userId = await _authRepository.CreateUser(newUser);
+        return userId;
     }
     
-    public async Task DeleteUser(User user)
-        => await _authRepository.DeleteUser(user);
+    public async Task DeleteUser(UserRecord userRecord)
+        => await _authRepository.DeleteUser(userRecord);
 
-    public async Task UpdateUser(User user)
-        => await _authRepository.UpdateUser(user);
+    public async Task UpdateUser(UserRecord userRecord)
+        => await _authRepository.UpdateUser(userRecord);
 }

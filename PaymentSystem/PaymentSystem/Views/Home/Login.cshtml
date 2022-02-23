@@ -1,0 +1,20 @@
+
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+
+<div class="d-flex justify-content-center" style="margin-top: 80px">
+    <div class="col-sm-5">
+        <div style="text-align: center;">
+            <h3>Sign In</h3>
+        </div>
+        <form class="d-flex flex-column" method="post" asp-controller="Auth" asp-action="Login">
+            <input type="email" placeholder="Email" name="Email" required style="margin: 5px 0; height: 40px;">
+            <input type="password" placeholder="Password" name="Password" required style="margin: 5px 0; height: 40px;">
+            <button class="btn btn-primary" type="submit" style="margin: 5px 0; height: 40px;">
+                Sign in
+            </button>
+        </form>
+    </div>
+</div>
