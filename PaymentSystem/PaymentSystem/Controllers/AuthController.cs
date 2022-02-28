@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentSystem.Models;
 using PaymentSystem.Services;
@@ -9,11 +10,11 @@ namespace PaymentSystem.Controllers;
 
 public class AuthController: Controller
 {
-    private readonly AuthService _authService;
+    private readonly AccountService _accountService;
     
-    public AuthController(AuthService authService)
+    public AuthController(AccountService accountService)
     {
-        _authService = authService;
+        _accountService = accountService;
     }
     
     [HttpPost]
@@ -22,7 +23,7 @@ public class AuthController: Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await _authService.GetUserByEmail(loginModel.Email);
+            var user = await _accountService.GetUserByEmailAsync(loginModel.Email);
             if (user == null)
             {
                 return BadRequest("User not found");
@@ -41,13 +42,13 @@ public class AuthController: Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await _authService.GetUserByEmail(registerModel.Email);
+            var user = await _accountService.GetUserByEmailAsync(registerModel.Email);
             if (user != null)
             {
                 return BadRequest("Email is used");
             }
             
-            var userId = await _authService.CreateUser(registerModel);
+            var userId = await _accountService.CreateUserAsync(registerModel);
             await AddCookie(userId);
             return Redirect("/");
         }
@@ -55,6 +56,7 @@ public class AuthController: Controller
         return BadRequest("Error model");
     }
     
+    [Authorize]
     public async Task<IActionResult> Logout()
     {
         await DeleteCookie();

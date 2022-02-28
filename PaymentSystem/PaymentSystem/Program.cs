@@ -8,23 +8,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PaymentSystemContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+    
+}, ServiceLifetime.Transient);
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.Events.OnRedirectToLogin = context =>
         {
-            context.RedirectUri = "/Home";
+            context.RedirectUri = "/Home/Login";
             return Task.CompletedTask;
         };
     });
 
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<RolesService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
-
+builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
+builder.Services.AddScoped<BalanceService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

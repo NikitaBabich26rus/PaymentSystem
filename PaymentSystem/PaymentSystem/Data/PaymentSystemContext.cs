@@ -20,8 +20,6 @@ namespace PaymentSystem.Data
 
             modelBuilder.Entity<BalanceRecord>(balanceRecord =>
             {
-                balanceRecord.HasNoKey();
-                
                 balanceRecord.HasOne(b => b.UserRecord)
                     .WithOne()
                     .HasForeignKey<BalanceRecord>(b => b.UserId)

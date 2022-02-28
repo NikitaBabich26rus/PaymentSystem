@@ -12,8 +12,10 @@ public class RolesService
         _rolesRepository = rolesRepository;
     }
 
-
-    public async Task AddUserRole(int userId, int roleId)
+    public async Task<List<string>> GetUserRoleAsync(int userId)
+        => await _rolesRepository.GetUserRolesAsync(userId);
+    
+    public async Task AddUserRoleAsync(int userId, int roleId)
     {
         var userRole = new UserRoleRecord()
         {

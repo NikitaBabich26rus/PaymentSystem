@@ -8,7 +8,7 @@ namespace PaymentSystem.Data
     public class BalanceRecord
     {
         [Column("user_id")]
-        [Required]
+        [Key]
         public int UserId { get; set; }
         
         [Column("amount")]

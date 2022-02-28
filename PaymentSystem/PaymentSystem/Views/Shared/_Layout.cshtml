@@ -32,7 +32,10 @@
                 }
                 else
                 {
-                    <div>
+                    <div class="d-flex flex-row">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
+                            Profile
+                        </a>
                         <button class="btn btn-light" onclick="location.href='@Url.Action("Logout", "Auth")'">
                             Logout
                         </button>
