@@ -2,7 +2,7 @@ using PaymentSystem.Data;
 
 namespace PaymentSystem.Models;
 
-public class UserProfile
+public class UserProfileModel
 {
     public string FirstName { get; set; }
     
@@ -16,5 +16,5 @@ public class UserProfile
     
     public decimal Balance { get; set; }
     
-    public List<string> Roles { get; set; }
+    public string Role { get; set; }
 }

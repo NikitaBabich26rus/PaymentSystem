@@ -18,9 +18,12 @@ public class RolesRepository: IRolesRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async Task<List<string>> GetUserRolesAsync(int userId)
-        => await _paymentSystemContext.UserRoles
-            .Where(x => x.UserId == userId)
-            .Select(x => x.RoleRecord.Name)
-            .ToListAsync();
+    public async Task<string> GetUserRolesAsync(int userId)
+    {
+        var userRole = await _paymentSystemContext.UserRoles
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+        var role = await _paymentSystemContext.Roles
+            .FirstOrDefaultAsync(x => x.Id == userRole!.RoleId);
+        return role!.Name;
+    }
 }

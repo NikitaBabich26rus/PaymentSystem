@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PaymentSystem.Models;
 
-public class RegisterModel
+public class UpdateAccountModel
 {
     [Required(ErrorMessage = "Не указано имя")]
     public string FirstName { get; set; }
@@ -13,13 +13,14 @@ public class RegisterModel
     [Required(ErrorMessage = "Не указан Email")]
     [RegularExpression(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}", ErrorMessage = "Некорректный адрес")]
     public string Email { get; set; }
-         
+    
+    [StringLength(30, MinimumLength = 6)]
     [Required(ErrorMessage = "Не указан пароль")]
     [DataType(DataType.Password)]
+    public string OldPassword { get; set; }
+    
     [StringLength(30, MinimumLength = 6)]
-    public string Password { get; set; }
-         
     [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Неверное подтверждение пароля")]
-    public string ConfirmPassword { get; set; }
+    [Required(ErrorMessage = "Не указан пароль")]
+    public string NewPassword { get; set; }
 }

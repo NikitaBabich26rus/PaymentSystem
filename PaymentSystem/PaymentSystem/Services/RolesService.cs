@@ -12,7 +12,7 @@ public class RolesService
         _rolesRepository = rolesRepository;
     }
 
-    public async Task<List<string>> GetUserRoleAsync(int userId)
+    public async Task<string> GetUserRoleAsync(int userId)
         => await _rolesRepository.GetUserRolesAsync(userId);
     
     public async Task AddUserRoleAsync(int userId, int roleId)

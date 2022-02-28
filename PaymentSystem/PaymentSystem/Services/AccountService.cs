@@ -20,13 +20,13 @@ public class AccountService
         _balanceService = balanceService;
     }
 
-    public async Task<UserProfile> GetUserProfile(int userId)
+    public async Task<UserProfileModel> GetUserProfile(int userId)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
-        var userRoles = await _rolesService.GetUserRoleAsync(userId);
+        var userRole = await _rolesService.GetUserRoleAsync(userId);
         var userBalance = await _balanceService.GetUserBalance(userId);
 
-        var userProfile = new UserProfile()
+        var userProfile = new UserProfileModel()
         {
             FirstName = user!.FirstName,
             LastName = user.LastName,
@@ -34,7 +34,7 @@ public class AccountService
             RegisteredAt = user.RegisteredAt,
             IsVerified = user.IsVerified,
             Balance = userBalance,
-            Roles = userRoles
+            Role = userRole
         };
         return userProfile;
     }
@@ -66,6 +66,18 @@ public class AccountService
     public async Task DeleteUserAsync(UserRecord userRecord)
         => await _accountRepository.DeleteUserAsync(userRecord);
 
-    public async Task UpdateUserAsync(UserRecord userRecord)
-        => await _accountRepository.UpdateUserAsync(userRecord);
+    public async Task UpdateUserAsync(UpdateAccountModel updateAccountModel, int userId)
+    {
+        var user = await _accountRepository.GetUserByIdAsync(userId);
+        if (String.CompareOrdinal(user!.Password, updateAccountModel.OldPassword) != 0)
+        {
+            throw new ArgumentException("Не верный пароль");
+        }
+
+        user.Email = updateAccountModel.Email;
+        user.Password = updateAccountModel.NewPassword;
+        user.FirstName = updateAccountModel.FirstName;
+        user.LastName = updateAccountModel.LastName;
+        await _accountRepository.UpdateUserAsync(user);
+    }
 }
