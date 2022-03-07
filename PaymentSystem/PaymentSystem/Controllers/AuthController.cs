@@ -64,21 +64,15 @@ public class AuthController: Controller
     }
 
     private async Task DeleteCookie()
-        => await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        => await HttpContext.SignOutAsync("Cookie");
     
     private async Task AddCookie(int userId)
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, userId.ToString())
+            new Claim(ClaimTypes.Sid, userId.ToString())
         };
-        var id = new ClaimsIdentity
-            (
-                claims,
-                "ApplicationCookie",
-                ClaimsIdentity.DefaultNameClaimType,
-                ClaimsIdentity.DefaultRoleClaimType
-            );
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        var id = new ClaimsIdentity(claims, "Cookie");
+        await HttpContext.SignInAsync("Cookie", new ClaimsPrincipal(id));
     }
 }

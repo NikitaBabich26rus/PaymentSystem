@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Models;
 using PaymentSystem.Services;
 
@@ -50,7 +49,7 @@ public class AccountController: Controller
 
     private int GetUserId()
     {
-        Int32.TryParse(HttpContext.User?.FindFirst(ClaimTypes.Name)?.Value, out var id);
+        Int32.TryParse(HttpContext.User?.FindFirst(ClaimTypes.Sid)?.Value, out var id);
         return id;
     }
 }

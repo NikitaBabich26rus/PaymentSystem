@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentSystem.Data;
@@ -11,9 +12,10 @@ using PaymentSystem.Data;
 namespace PaymentSystem.Migrations
 {
     [DbContext(typeof(PaymentSystemContext))]
-    partial class PaymentSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20220228153520_AddAdmin")]
+    partial class AddAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,13 +37,6 @@ namespace PaymentSystem.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("balances");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = 1,
-                            Amount = 1000m
-                        });
                 });
 
             modelBuilder.Entity("PaymentSystem.Data.FundTransferRecord", b =>
@@ -198,7 +193,7 @@ namespace PaymentSystem.Migrations
                             IsVerified = true,
                             LastName = "admin",
                             Password = "admin1234",
-                            RegisteredAt = new DateTime(2022, 2, 28, 15, 43, 18, 504, DateTimeKind.Utc).AddTicks(7881)
+                            RegisteredAt = new DateTime(2022, 2, 28, 15, 35, 20, 631, DateTimeKind.Utc).AddTicks(8795)
                         });
                 });
 
