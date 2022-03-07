@@ -62,6 +62,29 @@ namespace PaymentSystem.Data
                 new { Id = 3, Name = "KYC-Manager" },
                 new { Id = 4, Name = "Funds-Manager" }
             );
+
+            modelBuilder.Entity<UserRecord>().HasData(
+                new
+                {
+                    Id = 1,
+                    FirstName = "admin",
+                    LastName = "admin",
+                    Email = "admin@gmail.com",
+                    Password = "admin1234",
+                    RegisteredAt = DateTime.UtcNow,
+                    IsVerified = true,
+                }
+            );
+
+            modelBuilder.Entity<BalanceRecord>().HasData
+            (
+                new { UserId = 1, Amount = 1000m }
+            );
+
+            modelBuilder.Entity<UserRoleRecord>().HasData
+            (
+                new { Id = 1, UserId = 1, RoleId = 2 }
+            );
         }
     }
 }

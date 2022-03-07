@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Data;
 using PaymentSystem.Repositories;
@@ -11,8 +10,8 @@ builder.Services.AddDbContext<PaymentSystemContext>(opt =>
     
 }, ServiceLifetime.Transient);
 builder.Services.AddControllersWithViews();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+builder.Services.AddAuthentication("Cookie")
+    .AddCookie("Cookie", options =>
     {
         options.Events.OnRedirectToLogin = context =>
         {
