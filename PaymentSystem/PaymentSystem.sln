@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentSystem", "PaymentSystem\PaymentSystem.csproj", "{42CB9C8F-0910-4A91-9D22-DD35876B0D14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentSystem.Tests", "PaymentSystem.Tests\PaymentSystem.Tests.csproj", "{A8E71C47-871B-4C77-9B39-367B7B440C74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CB9C8F-0910-4A91-9D22-DD35876B0D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42CB9C8F-0910-4A91-9D22-DD35876B0D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42CB9C8F-0910-4A91-9D22-DD35876B0D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42CB9C8F-0910-4A91-9D22-DD35876B0D14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8E71C47-871B-4C77-9B39-367B7B440C74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E71C47-871B-4C77-9B39-367B7B440C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E71C47-871B-4C77-9B39-367B7B440C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E71C47-871B-4C77-9B39-367B7B440C74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,89 @@
+@model PaymentSystem.Models.UserProfileModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<h4>Profile</h4>
+
+<div>
+    <table class="table table-striped table-dark">
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Registered at</th>
+            <th>Is verified</th>
+            <th>Balance</th>
+            <th>Roles</th>
+        </tr>
+        <tbody>
+        <tr>
+            <td>@Model.FirstName</td>
+            <td>@Model.LastName</td>
+            <td>@Model.Email</td>
+            <td>@Model.RegisteredAt</td>
+            @if (Model.IsVerified == null)
+            {
+                <td>false</td>    
+            }
+            else
+            {
+                <td>@Model.IsVerified</td>
+            }
+            <td>@Model.Balance</td>
+            <td>@Model.Role</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center" style="margin-top: 50px">
+        <div class="col-sm-5">
+            <div style="text-align: center;">
+                <h3>Edit profile</h3>
+            </div>
+            <form class="d-flex flex-column" method="post" asp-controller="Account" asp-action="UpdateAccount">
+                <input 
+                    type="text"
+                    required
+                    value="@Model.FirstName"
+                    placeholder="New first name"
+                    name="FirstName"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input 
+                    type="text"
+                    required
+                    value="@Model.LastName"
+                    placeholder="New last name"
+                    name="LastName"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input 
+                    type="email"
+                    required
+                    value="@Model.Email"
+                    placeholder="New email"
+                    name="Email"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input 
+                    type="password"
+                    required
+                    placeholder="Old password"
+                    name="OldPassword"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input 
+                    type="password"
+                    required
+                    placeholder="New password"
+                    name="NewPassword"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <button class="btn btn-primary" style="margin: 5px 0; height: 40px;">
+                    Edit
+                </button>          
+            </form>
+        </div>
+    </div>
+</div>
