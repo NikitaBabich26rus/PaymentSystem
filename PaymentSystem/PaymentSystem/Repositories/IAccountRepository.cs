@@ -1,4 +1,5 @@
 using PaymentSystem.Data;
+using PaymentSystem.Models;
 
 namespace PaymentSystem.Repositories;
 
@@ -13,5 +14,7 @@ public interface IAccountRepository
 
     Task DeleteUserAsync(UserRecord userRecord);
     
-    Task UpdateUserAsync(UserRecord userRecord);  
+    Task UpdateUserAsync(UserRecord userRecord);
+
+    Task<IEnumerable<UserRoleRecord>> GetUsersAsync();
 }

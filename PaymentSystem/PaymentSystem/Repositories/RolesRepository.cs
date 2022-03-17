@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Data;
+using PaymentSystem.Models;
 
 namespace PaymentSystem.Repositories;
 
@@ -26,4 +27,5 @@ public class RolesRepository: IRolesRepository
             .FirstOrDefaultAsync(x => x.Id == userRole!.RoleId);
         return role!.Name;
     }
+    
 }

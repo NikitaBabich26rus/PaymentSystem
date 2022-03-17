@@ -18,16 +18,6 @@ public class HomeController : Controller
         return View("Index");
     }
 
-    public IActionResult Register()
-    {
-        return View("Register");
-    }
-    
-    public IActionResult Login()
-    {
-        return View("Login");
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

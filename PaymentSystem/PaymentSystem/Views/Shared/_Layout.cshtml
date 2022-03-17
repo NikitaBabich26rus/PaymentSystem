@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService _authorizationService
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -12,36 +15,39 @@
 <header>
     <div class="container"> 
         <nav class="navbar navbar-light bg-light justify-content-between">
-                <div class="d-flex flex-row">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                        PaymentSystem
-                    </a>
-                </div>
-        
-                @if (!User.Identity.IsAuthenticated)
+            <div class="d-flex flex-row">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    PaymentSystem
+                </a>
+            </div>
+            
+            <div class="d-flex flex-row">
+                @if ((await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
                 {
-                    <div class="d-flex flex-row">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">
-                            Sign In
-                        </a>
-        
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Register">
-                            Sign Up
-                        </a>
-                    </div>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Users">
+                        Users
+                    </a>
+                }
+                @if (!User.Identity!.IsAuthenticated)
+                {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">
+                        Sign In
+                    </a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Register">
+                        Sign Up
+                    </a>
                 }
                 else
                 {
-                    <div class="d-flex flex-row">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
-                            Profile
-                        </a>
-                        <button class="btn btn-light" onclick="location.href='@Url.Action("Logout", "Auth")'">
-                            Logout
-                        </button>
-                    </div>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
+                        Profile
+                    </a>
+                    <button class="btn btn-light" onclick="location.href='@Url.Action("Logout", "Auth")'">
+                        Logout
+                    </button>
                 }
-            </nav>
+            </div>
+        </nav>
     </div>
 </header>
 <div class="container">

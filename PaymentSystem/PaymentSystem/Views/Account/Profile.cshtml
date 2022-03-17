@@ -42,47 +42,48 @@
                 <h3>Edit profile</h3>
             </div>
             <form class="d-flex flex-column" method="post" asp-controller="Account" asp-action="UpdateAccount">
-                <input 
+                @if (@ViewBag.Error != null)
+                {
+                    <div style="color: red; text-align: center;">
+                        @ViewBag.Error
+                    </div>
+                }
+                <input
                     type="text"
                     required
                     value="@Model.FirstName"
                     placeholder="New first name"
                     name="FirstName"
-                    style="margin: 5px 0; height: 40px;"
-                />
-                <input 
+                    style="margin: 5px 0; height: 40px;"/>
+                <input
                     type="text"
                     required
                     value="@Model.LastName"
                     placeholder="New last name"
                     name="LastName"
-                    style="margin: 5px 0; height: 40px;"
-                />
-                <input 
+                    style="margin: 5px 0; height: 40px;"/>
+                <input
                     type="email"
                     required
                     value="@Model.Email"
                     placeholder="New email"
                     name="Email"
-                    style="margin: 5px 0; height: 40px;"
-                />
-                <input 
+                    style="margin: 5px 0; height: 40px;"/>
+                <input
                     type="password"
                     required
                     placeholder="Old password"
                     name="OldPassword"
-                    style="margin: 5px 0; height: 40px;"
-                />
-                <input 
+                    style="margin: 5px 0; height: 40px;"/>
+                <input
                     type="password"
                     required
                     placeholder="New password"
                     name="NewPassword"
-                    style="margin: 5px 0; height: 40px;"
-                />
+                    style="margin: 5px 0; height: 40px;"/>
                 <button class="btn btn-primary" style="margin: 5px 0; height: 40px;">
                     Edit
-                </button>          
+                </button>
             </form>
         </div>
     </div>

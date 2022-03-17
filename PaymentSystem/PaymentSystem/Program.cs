@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Data;
 using PaymentSystem.Repositories;
@@ -19,6 +20,26 @@ builder.Services.AddAuthentication("Cookie")
             return Task.CompletedTask;
         };
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", authorizationPolicyBuilder =>
+    {
+        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "Admin");
+    });
+    options.AddPolicy("User", authorizationPolicyBuilder =>
+    {
+        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "User");
+    });
+    options.AddPolicy("KYC-Manager", authorizationPolicyBuilder =>
+    {
+        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "KYC-Manager");
+    });
+    options.AddPolicy("Funds-Manager", authorizationPolicyBuilder =>
+    {
+        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "Funds-Manager");
+    });
+});
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<AccountService>();
@@ -42,7 +63,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 app.Run();
 public partial class Program { }

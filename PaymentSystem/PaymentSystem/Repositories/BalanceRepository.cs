@@ -12,7 +12,7 @@ public class BalanceRepository: IBalanceRepository
         _paymentSystemContext = paymentSystemContext;
     }
 
-    public async Task<decimal> GetUserBalance(int userId)
+    public async ValueTask<decimal> GetUserBalanceAsync(int userId)
     {
         var balance = await _paymentSystemContext.Balances.FirstOrDefaultAsync(x => x.UserId == userId);
         return balance!.Amount;

@@ -9,7 +9,7 @@ namespace PaymentSystem.Controllers;
 public class AccountController: Controller
 {
     private readonly AccountService _accountService;
-    
+
     public AccountController(AccountService accountService)
     {
         _accountService = accountService;
@@ -27,24 +27,34 @@ public class AccountController: Controller
     [HttpPost]
     public async Task<IActionResult> UpdateAccount(UpdateAccountModel updateAccountModel)
     {
+        var userId = GetUserId();
         if (!ModelState.IsValid)
         {
-            var errors = ModelState.Values
-                .Select(x => x.Errors)
-                .ToArray();
-            return BadRequest(" Error model");
+            var userProfile = await _accountService.GetUserProfile(userId);
+            ViewBag.Error = "Validation error";
+            return View("Profile", userProfile);
         }
         
-        var userId = GetUserId();
         try
         {
             await _accountService.UpdateUserAsync(updateAccountModel, userId);
         }
         catch (ArgumentException e)
         {
-            return BadRequest($"{e.Message}");
+            ViewBag.Error = $"{e.Message}";
+            var userProfile = await _accountService.GetUserProfile(userId);
+            return View("Profile", userProfile);
         }
         return Redirect("/");
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "Admin")]
+    public async Task<IActionResult> Users()
+    {
+        var usersProfiles = await _accountService.GetUsersProfiles();
+
+        return View("Users", usersProfiles);
     }
 
     private int GetUserId()
