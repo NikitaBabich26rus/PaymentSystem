@@ -20,7 +20,10 @@ public class AccountService
         _balanceService = balanceService;
     }
 
-    public async Task<UserProfileModel> GetUserProfile(int userId)
+    public async ValueTask<UserRecord?> GetUserByIdAsync(int id)
+        => await _accountRepository.GetUserByIdAsync(id);
+
+    public async ValueTask<UserProfileModel> GetUserProfileAsync(int userId)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
         var userRole = await _rolesService.GetUserRoleAsync(userId);
@@ -28,11 +31,13 @@ public class AccountService
 
         var userProfile = new UserProfileModel()
         {
-            FirstName = user!.FirstName,
+            Id = user!.Id,
+            FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
             RegisteredAt = user.RegisteredAt,
             IsVerified = user.IsVerified,
+            IsBlocked = user.IsBlocked,
             Balance = userBalance,
             Role = userRole
         };
@@ -66,21 +71,26 @@ public class AccountService
     public async Task DeleteUserAsync(UserRecord userRecord)
         => await _accountRepository.DeleteUserAsync(userRecord);
 
-    public async Task UpdateUserAsync(UpdateAccountModel updateAccountModel, int userId)
+    public async Task UpdateUserAsync(UpdateProfileModel updateProfileModel, UserRecord user)
     {
-        var user = await _accountRepository.GetUserByIdAsync(userId);
-        if (String.CompareOrdinal(user!.Password, updateAccountModel.OldPassword) != 0)
-        {
-            throw new ArgumentException("Password error");
-        }
-
-        user.Email = updateAccountModel.Email;
-        user.Password = updateAccountModel.NewPassword;
-        user.FirstName = updateAccountModel.FirstName;
-        user.LastName = updateAccountModel.LastName;
+        user.Email = updateProfileModel.Email;
+        user.Password = updateProfileModel.NewPassword;
+        user.FirstName = updateProfileModel.FirstName;
+        user.LastName = updateProfileModel.LastName;
         await _accountRepository.UpdateUserAsync(user);
     }
 
+    public async Task UpdateUserByAdminAsync(UpdateUserProfileModel updateUser, int userId)
+    {
+        var user = await _accountRepository.GetUserByIdAsync(userId);
+        user!.Email = updateUser.Email;
+        user.FirstName = updateUser.FirstName;
+        user.LastName = updateUser.LastName;
+        user.IsBlocked = updateUser.Status != "Active";
+        await _rolesService.UpdateUserRoleAsync(updateUser.Role, userId);
+        await _accountRepository.UpdateUserAsync(user);
+    }
+    
     public async Task<List<UserProfileModel>> GetUsersProfiles()
     {
         var users = await _accountRepository.GetUsersAsync();
@@ -88,15 +98,20 @@ public class AccountService
 
         foreach (var user in users)
         {
+            if (user.RoleRecord.Name == "Admin")
+                continue;
+            
             var userBalance = await _balanceService.GetUserBalanceAsync(user.UserRecord.Id);
 
             usersProfiles.Add(new UserProfileModel()
             {
+                Id = user.UserRecord.Id,
                 FirstName = user.UserRecord.FirstName,
                 LastName = user.UserRecord.LastName,
                 Email = user.UserRecord.Email,
                 RegisteredAt = user.UserRecord.RegisteredAt,
                 IsVerified = user.UserRecord.IsVerified,
+                IsBlocked = user.UserRecord.IsBlocked,
                 Balance = userBalance,
                 Role = user.RoleRecord.Name
             });

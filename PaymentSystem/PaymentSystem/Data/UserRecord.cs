@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaymentSystem.Data
@@ -34,6 +35,10 @@ namespace PaymentSystem.Data
         
         [Column("is_verified")]
         public bool? IsVerified { get; set; }
+        
+        [Column("is_blocked")]
+        [DefaultValue(false)]
+        public bool IsBlocked { get; set; }
         
         [Column("password")]
         [MaxLength(30)]

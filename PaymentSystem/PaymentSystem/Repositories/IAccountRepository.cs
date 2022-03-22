@@ -6,9 +6,9 @@ namespace PaymentSystem.Repositories;
 public interface IAccountRepository
 {
 
-    Task<UserRecord?> GetUserByEmailAsync(string email);
+    ValueTask<UserRecord?> GetUserByEmailAsync(string email);
     
-    Task<UserRecord?> GetUserByIdAsync(int userId);
+    ValueTask<UserRecord?> GetUserByIdAsync(int userId);
     
     Task<int> CreateUserAsync(UserRecord userRecord);
 

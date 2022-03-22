@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Data;
-using PaymentSystem.Models;
 
 namespace PaymentSystem.Repositories;
 
@@ -19,7 +18,7 @@ public class RolesRepository: IRolesRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async Task<string> GetUserRolesAsync(int userId)
+    public async ValueTask<string> GetUserRolesAsync(int userId)
     {
         var userRole = await _paymentSystemContext.UserRoles
             .FirstOrDefaultAsync(x => x.UserId == userId);
@@ -27,5 +26,29 @@ public class RolesRepository: IRolesRepository
             .FirstOrDefaultAsync(x => x.Id == userRole!.RoleId);
         return role!.Name;
     }
+
+    public async Task UpdateUserRoleAsync(string roleName, int userId)
+    {
+        var roles = await GetRolesAsync();
+        var userRoleRecord = await _paymentSystemContext.UserRoles
+            .Include(x => x.RoleRecord)
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+        
+        if (userRoleRecord!.RoleRecord.Name != roleName)
+        {
+            roles.ForEach(r =>
+            {
+                if (r.Name == roleName)
+                {
+                    userRoleRecord.RoleId = r.Id;
+                }
+            });
+            
+            await _paymentSystemContext.SaveChangesAsync();
+        }
+    }
+
+    public async ValueTask<List<RoleRecord>> GetRolesAsync()
+        => await _paymentSystemContext.Roles.ToListAsync();
     
 }

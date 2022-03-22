@@ -1,0 +1,105 @@
+@model PaymentSystem.Models.EditUserProfileModel
+
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+    <div class="col-sm-5">
+        <div style="text-align: center;">
+            <h3>Edit profile</h3>
+        </div>
+        <form 
+            class="d-flex flex-column"
+            method="post"
+            asp-controller="Account"
+            asp-action="UpdateUserProfile"
+            asp-route-id="@Model.UserProfile.Id"
+        >
+            @if (@ViewBag.Error != null)
+            {
+                <div style="color: red; text-align: center;">
+                    @ViewBag.Error
+                </div>
+            }
+            <input
+                type="text"
+                required
+                value="@Model.UserProfile.FirstName"
+                placeholder="New first name"
+                name="FirstName"
+                style="margin: 5px 0; height: 40px;"
+            />
+            <input
+                type="text"
+                required
+                value="@Model.UserProfile.LastName"
+                placeholder="New last name"
+                name="LastName"
+                style="margin: 5px 0; height: 40px;"
+            />
+            <input
+                type="email"
+                required
+                value="@Model.UserProfile.Email"
+                placeholder="New email"
+                name="Email"
+                style="margin: 5px 0; height: 40px;"
+            />
+            <div style="margin: 8px 8px;">
+                Change role:
+            </div>
+            <div class="d-flex justify-content-center">
+                @foreach (var role in @Model.Roles)
+                {
+                    <div class="form-check form-check-inline">
+                        @if (Model.UserProfile.Role == role.Name)
+                        {
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="Role"
+                                value="@role.Name"
+                                id="flexRadioDefault1"
+                                checked>
+                        }
+                        else
+                        {
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="Role"
+                                value="@role.Name"
+                                id="flexRadioDefault1">
+                        }
+                        <label class="form-check-label" for="flexRadioDefault1">
+                            @role.Name
+                        </label>
+                    </div>
+                }
+            </div>
+            <div class="form-group" style="margin: 8px 8px;">
+                <label for="exampleFormControlSelect1">User status</label>
+                <select class="form-control" id="exampleFormControlSelect1" name="Status">
+                    @if (Model.UserProfile.IsBlocked)
+                    {
+                        <option value="Active">
+                            Active
+                        </option>
+                        <option selected value="Blocked">
+                            Blocked
+                        </option>   
+                    }
+                    else
+                    {
+                        <option selected value="Active">
+                            Active
+                        </option>
+                        <option value="Blocked">
+                            Blocked
+                        </option>
+                    }
+                </select>
+            </div>
+            <button class="btn btn-primary" style="margin: 5px 0; height: 40px;">
+                Edit
+            </button>
+        </form>
+    </div>
+</div>

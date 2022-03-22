@@ -10,6 +10,7 @@
             <th>Is verified</th>
             <th>Balance</th>
             <th>Roles</th>
+            <th>Edit</th>
         </tr>
         <tbody>
             @foreach (var user in Model)
@@ -29,6 +30,15 @@
                     }
                     <td>@user.Balance</td>
                     <td>@user.Role</td>
+                    <td>
+                        <button 
+                            type="button"
+                            class="btn btn-primary"
+                            onclick="location.href='@Url.Action("UserProfile", "Account", new {userId = user.Id})'"
+                        >
+                            Edit
+                        </button>
+                    </td>
                 </tr>   
             }
         </tbody>

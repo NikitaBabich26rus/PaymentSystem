@@ -72,6 +72,7 @@ namespace PaymentSystem.Data
                     Email = "admin@gmail.com",
                     Password = "admin1234",
                     RegisteredAt = DateTime.UtcNow,
+                    IsBlocked = false,
                     IsVerified = true,
                 }
             );

@@ -40,6 +40,11 @@ public class AuthController: Controller
                 ViewBag.Error = "User not found";
                 return View("Login");
             }
+            if (user.IsBlocked)
+            {
+                ViewBag.Error = "Account is blocked";
+                return View("Login");
+            }
             
             var userRole = await _rolesService.GetUserRoleAsync(user.Id);
             await AddCookie(user.Id, userRole);

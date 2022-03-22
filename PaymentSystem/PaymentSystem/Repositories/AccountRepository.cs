@@ -12,10 +12,10 @@ public class AccountRepository : IAccountRepository
         _paymentSystemContext = paymentSystemContext;
     }
 
-    public async Task<UserRecord?> GetUserByEmailAsync(string email)
+    public async ValueTask<UserRecord?> GetUserByEmailAsync(string email)
         => await _paymentSystemContext.Users.FirstOrDefaultAsync(user => user.Email == email);
 
-    public async Task<UserRecord?> GetUserByIdAsync(int userId)
+    public async ValueTask<UserRecord?> GetUserByIdAsync(int userId)
         => await _paymentSystemContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
 
     public async Task<int> CreateUserAsync(UserRecord newUserRecord)

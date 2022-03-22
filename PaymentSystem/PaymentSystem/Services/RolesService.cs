@@ -12,8 +12,11 @@ public class RolesService
         _rolesRepository = rolesRepository;
     }
 
-    public async Task<string> GetUserRoleAsync(int userId)
+    public async ValueTask<string> GetUserRoleAsync(int userId)
         => await _rolesRepository.GetUserRolesAsync(userId);
+
+    public async ValueTask<List<RoleRecord>> GetRolesAsync()
+        => await _rolesRepository.GetRolesAsync();
     
     public async Task AddUserRoleAsync(int userId, int roleId)
     {
@@ -25,5 +28,8 @@ public class RolesService
         
         await _rolesRepository.AddUserRolesAsync(userRole);
     }
-    
+
+    public async Task UpdateUserRoleAsync(string roleName, int userId)
+        => await _rolesRepository.UpdateUserRoleAsync(roleName, userId);
+
 }

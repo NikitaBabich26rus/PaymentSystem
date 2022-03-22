@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PaymentSystem.Models;
 
-public class UpdateAccountModel
+public class UpdateProfileModel
 {
     [Required(ErrorMessage = "Не указано имя")]
     public string FirstName { get; set; }
