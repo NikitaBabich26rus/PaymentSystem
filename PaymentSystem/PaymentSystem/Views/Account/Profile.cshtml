@@ -23,14 +23,7 @@
             <td>@Model.LastName</td>
             <td>@Model.Email</td>
             <td>@Model.RegisteredAt</td>
-            @if (Model.IsVerified == null)
-            {
-                <td>false</td>    
-            }
-            else
-            {
-                <td>@Model.IsVerified</td>
-            }
+            <td>@Model.IsVerified</td>
             <td>@Model.Balance</td>
             <td>@Model.Role</td>
         </tr>

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using PaymentSystem.Data;
 
 namespace PaymentSystem.Models;

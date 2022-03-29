@@ -10,6 +10,9 @@ namespace PaymentSystem.Data
         }
         
         public DbSet<BalanceRecord> Balances { get; set; }
+        
+        public DbSet<VerificationTransferRecord> VerificationTransfers { get; set; }
+
         public DbSet<FundTransferRecord> FundTransfers { get; set; }
         public DbSet<RoleRecord> Roles { get; set; }
         public DbSet<UserRecord> Users { get; set; }
@@ -18,14 +21,12 @@ namespace PaymentSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<BalanceRecord>(balanceRecord =>
-            {
-                balanceRecord.HasOne(b => b.UserRecord)
-                    .WithOne()
-                    .HasForeignKey<BalanceRecord>(b => b.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-            
+            modelBuilder.Entity<BalanceRecord>()
+                .HasOne(b => b.UserRecord)
+                .WithOne(u => u.Balance)
+                .HasForeignKey<BalanceRecord>(b => b.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<UserRoleRecord>()
                 .HasOne(ur => ur.RoleRecord)
                 .WithMany(r => r.UserRoleRecords)
@@ -55,7 +56,19 @@ namespace PaymentSystem.Data
                 .WithMany(u => u.FundTransferConfirmedBy)
                 .HasForeignKey(f => f.ConfirmedBy)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
+            modelBuilder.Entity<VerificationTransferRecord>()
+                .HasOne(v => v.User)
+                .WithOne(u => u.VerificationTransfer)
+                .HasForeignKey<VerificationTransferRecord>(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VerificationTransferRecord>()
+                .HasOne(v => v.ConfirmedByUser)
+                .WithMany(u => u.VerificationTransfersConfirmedBy)
+                .HasForeignKey(v => v.ConfirmedBy)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<RoleRecord>().HasData(
                 new { Id = 1, Name = "User" },
                 new { Id = 2, Name = "Admin" },
@@ -66,25 +79,35 @@ namespace PaymentSystem.Data
             modelBuilder.Entity<UserRecord>().HasData(
                 new
                 {
-                    Id = 1,
+                    Id = 2,
                     FirstName = "admin",
                     LastName = "admin",
                     Email = "admin@gmail.com",
                     Password = "admin1234",
                     RegisteredAt = DateTime.UtcNow,
                     IsBlocked = false,
-                    IsVerified = true,
+                    IsVerified = false
                 }
             );
 
             modelBuilder.Entity<BalanceRecord>().HasData
             (
-                new { UserId = 1, Amount = 1000m }
+                new
+                {
+                    Id = 1,
+                    UserId = 2,
+                    Amount = 1000m
+                }
             );
 
             modelBuilder.Entity<UserRoleRecord>().HasData
             (
-                new { Id = 1, UserId = 1, RoleId = 2 }
+                new 
+                {
+                    Id = 1,
+                    UserId = 2,
+                    RoleId = 2
+                }
             );
         }
     }

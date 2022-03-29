@@ -20,14 +20,7 @@
                     <td>@user.LastName</td>
                     <td>@user.Email</td>
                     <td>@user.RegisteredAt</td>
-                    @if (user.IsVerified == null)
-                    {
-                        <td>false</td>
-                    }
-                    else
-                    {
-                        <td>@user.IsVerified</td>
-                    }
+                    <td>@user.IsVerified</td>
                     <td>@user.Balance</td>
                     <td>@user.Role</td>
                     <td>

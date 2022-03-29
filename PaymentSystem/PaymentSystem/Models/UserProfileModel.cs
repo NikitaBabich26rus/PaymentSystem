@@ -14,7 +14,7 @@ public class UserProfileModel
     
     public DateTime RegisteredAt { get; set; }
 
-    public bool? IsVerified { get; set; }
+    public bool IsVerified { get; set; }
     
     public bool IsBlocked { get; set; }
     
