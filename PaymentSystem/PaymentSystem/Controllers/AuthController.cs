@@ -35,14 +35,22 @@ public class AuthController: Controller
         if (ModelState.IsValid)
         {
             var user = await _accountService.GetUserByEmailAsync(loginModel.Email);
+            
             if (user == null)
             {
-                ViewBag.Error = "User not found";
+                ViewBag.Error = "Error email";
                 return View("Login");
             }
+            
             if (user.IsBlocked)
             {
                 ViewBag.Error = "Account is blocked";
+                return View("Login");
+            }
+
+            if (String.CompareOrdinal(user.Password, loginModel.Password) != 0)
+            {
+                ViewBag.Error = "Error password";
                 return View("Login");
             }
             

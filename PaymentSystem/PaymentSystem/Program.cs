@@ -42,6 +42,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<RolesService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();

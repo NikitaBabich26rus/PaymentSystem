@@ -1,0 +1,74 @@
+@model PaymentSystem.Data.VerificationTransferRecord
+
+
+<div style="margin-top: 50px">
+    <div style="text-align: center">
+        <h2>
+            Verification
+        </h2>
+    </div>
+    <div class="d-flex justify-content-center" style="margin-top: 50px">
+        <div class="col-sm-5">
+            @if (Model == null)
+            {
+                <div style="text-align: center;">
+                    <h6>
+                        Enter passport data for verification
+                    </h6>
+                </div>
+                <form
+                    class="d-flex flex-column"
+                    method="post"
+                    asp-controller="Account"
+                    asp-action="VerifyUser"
+                >
+                    @if (@ViewBag.Error != null)
+                    {
+                        <div style="color: red; text-align: center;">
+                            @ViewBag.Error
+                        </div>
+                    }
+                    <input
+                        type="text"
+                        maxlength="10"
+                        required
+                        placeholder="Passport data"
+                        name="passportData"
+                        style="margin: 5px 0; height: 40px;"/>
+                    <button class="btn btn-primary">
+                        Verify
+                    </button>
+                </form>   
+            }
+            else
+            {
+                <div style="text-align: center;">
+                    <h6>
+                        Wait for passport data verification
+                    </h6>
+                </div>
+                <div class="card" style="width: 18rem;">
+                    <div class="card-header">
+                        Verification
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            FirstName: @Model.User.FirstName
+                        </li>
+                        <li class="list-group-item">
+                            LastName: @Model.User.LastName
+                        </li>
+                        <li class="list-group-item">
+                            Passport data: @Model.PassportData
+                        </li>
+                        <li class="list-group-item">
+                            Date: @Model.CreatedAt
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+        
+        

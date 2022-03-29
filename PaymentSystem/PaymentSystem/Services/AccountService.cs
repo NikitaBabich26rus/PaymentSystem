@@ -9,15 +9,18 @@ public class AccountService
     private readonly IAccountRepository _accountRepository;
     private readonly RolesService _rolesService;
     private readonly BalanceService _balanceService;
+    private readonly IVerificationRepository _verificationRepository;
     
     public AccountService(
         IAccountRepository accountRepository,
         RolesService rolesService,
-        BalanceService balanceService)
+        BalanceService balanceService,
+        IVerificationRepository verificationRepository)
     {
         _accountRepository = accountRepository;
         _rolesService = rolesService;
         _balanceService = balanceService;
+        _verificationRepository = verificationRepository;
     }
 
     public async ValueTask<UserRecord?> GetUserByIdAsync(int id)
@@ -90,7 +93,13 @@ public class AccountService
         await _rolesService.UpdateUserRoleAsync(updateUser.Role, userId);
         await _accountRepository.UpdateUserAsync(user);
     }
-    
+
+    public async Task VerifyUserAsync(int userId, string passportData)
+        => await _verificationRepository.VerifyUserAsync(userId, passportData);
+
+    public async ValueTask<VerificationTransferRecord?> GetUserVerificationAsync(int userId)
+        => await _verificationRepository.GetUserVerificationAsync(userId);
+
     public async Task<List<UserProfileModel>> GetUsersProfiles()
     {
         var users = await _accountRepository.GetUsersAsync();

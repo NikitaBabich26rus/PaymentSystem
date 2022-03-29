@@ -28,7 +28,8 @@ public class AccountController: Controller
         return View("Profile", userProfile);
     }
     
-    [HttpPut]
+    [HttpPost]
+    [Authorize]
     public async Task<IActionResult> UpdateProfile(UpdateProfileModel updateProfileModel)
     {
         var userId = GetUserId();
@@ -85,6 +86,32 @@ public class AccountController: Controller
         }
 
         await _accountService.UpdateUserByAdminAsync(userProfile, userId);
+        return Redirect("/");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Verification()
+    {
+        var userId = GetUserId();
+        var userVerification = await _accountService.GetUserVerificationAsync(userId);
+
+        return View("Verification", userVerification);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> VerifyUser(string passportData)
+    {
+        var userId = GetUserId();
+        if (!Int64.TryParse(passportData, out long passportDataInt))
+        {
+            var userVerification = await _accountService.GetUserVerificationAsync(userId);
+            ViewBag.Error = "Validation error";
+            return View("Verification", userVerification);
+        }
+        
+        await _accountService.VerifyUserAsync(userId, passportData);
         return Redirect("/");
     }
 
