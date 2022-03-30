@@ -1,0 +1,30 @@
+@model List<PaymentSystem.Data.VerificationTransferRecord> 
+
+<div>
+    <h4>
+        Verified users page
+    </h4>
+    <table class="table table-striped table-dark" style="margin-top: 30px">
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Passport data</th>
+            <th>Confirmed by</th>
+            <th>Confirmed at</th>
+        </tr>
+        <tbody>
+        @foreach (var verification in Model)
+        {
+            <tr>
+                <td>@verification.User.FirstName</td>
+                <td>@verification.User.LastName</td>
+                <td>@verification.User.Email</td>
+                <td>@verification.PassportData</td>
+                <td>@verification.ConfirmedByUser.FirstName  @verification.ConfirmedByUser.LastName</td>
+                <td>@verification.ConfirmedAt</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

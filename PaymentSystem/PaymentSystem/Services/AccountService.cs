@@ -98,7 +98,7 @@ public class AccountService
         => await _verificationRepository.VerifyUserAsync(userId, passportData);
 
     public async ValueTask<VerificationTransferRecord?> GetUserVerificationAsync(int userId)
-        => await _verificationRepository.GetUserVerificationAsync(userId);
+        => await _verificationRepository.GetVerificationByUserIdAsync(userId);
 
     public async Task<List<UserProfileModel>> GetUsersProfiles()
     {

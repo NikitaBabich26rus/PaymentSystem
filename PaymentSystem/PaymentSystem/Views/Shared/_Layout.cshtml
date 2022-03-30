@@ -24,8 +24,20 @@
             <div class="d-flex flex-row">
                 @if ((await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
                 {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
+                        Verified users
+                    </a>
                     <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Users">
                         Users
+                    </a>
+                }
+                @if ((await _authorizationService.AuthorizeAsync(User, "KYC-Manager")).Succeeded)
+                {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
+                        Verified users
+                    </a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifyUsers">
+                        Verify users
                     </a>
                 }
                 @if (!User.Identity!.IsAuthenticated)

@@ -1,0 +1,46 @@
+@model List<PaymentSystem.Data.VerificationTransferRecord>
+
+<div>
+    <h4>
+        Verify users page
+    </h4>
+    <table class="table table-striped table-dark" style="margin-top: 30px">
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Passport data</th>
+            <th>Date</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tbody>
+        @foreach (var verification in Model)
+        {
+            <tr>
+                <td>@verification.User.FirstName</td>
+                <td>@verification.User.LastName</td>
+                <td>@verification.User.Email</td>
+                <td>@verification.PassportData</td>
+                <td>@verification.CreatedAt</td>
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        onclick="location.href='@Url.Action("AcceptUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        Accept
+                    </button>
+                </td>
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        onclick="location.href='@Url.Action("RejectUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        Reject
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
