@@ -12,10 +12,10 @@ public class BalanceService
         _balanceRepository = balanceRepository;
     }
 
-    public async Task<decimal> GetUserBalance(int userId)
-        => await _balanceRepository.GetUserBalance(userId);
-
-        public async Task CreateBalanceForUserAsync(int userId)
+    public async ValueTask<decimal> GetUserBalanceAsync(int userId)
+        => await _balanceRepository.GetUserBalanceAsync(userId);
+    
+    public async Task CreateBalanceForUserAsync(int userId)
     {
         var balanceRecord = new BalanceRecord()
         {

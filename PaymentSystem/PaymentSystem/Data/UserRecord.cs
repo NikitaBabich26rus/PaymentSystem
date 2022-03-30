@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaymentSystem.Data
@@ -28,18 +29,26 @@ namespace PaymentSystem.Data
         [Column("registered_at")]
         [Required]
         public DateTime RegisteredAt { get; set; }
-        
-        [Column("Passport_data")]
-        public string? PassportData { get; set; }
+
+        [Column("is_blocked")]
+        [DefaultValue(false)]
+        public bool IsBlocked { get; set; }
         
         [Column("is_verified")]
-        public bool? IsVerified { get; set; }
+        [DefaultValue(false)]
+        public bool IsVerified { get; set; }
         
         [Column("password")]
         [MaxLength(30)]
         [Required]
         public string Password { get; set; }
-
+        
+        public BalanceRecord Balance { get; set; }
+        
+        public VerificationTransferRecord VerificationTransfer { get; set; }
+        
+        public List<VerificationTransferRecord> VerificationTransfersConfirmedBy { get; set; }
+        
         public List<UserRoleRecord> UserRoleRecords { get; set; }
         
         public List<FundTransferRecord> FundTransferConfirmedBy { get; set; }

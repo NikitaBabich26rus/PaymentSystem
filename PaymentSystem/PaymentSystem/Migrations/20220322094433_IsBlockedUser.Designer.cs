@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentSystem.Data;
@@ -11,9 +12,10 @@ using PaymentSystem.Data;
 namespace PaymentSystem.Migrations
 {
     [DbContext(typeof(PaymentSystemContext))]
-    partial class PaymentSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20220322094433_IsBlockedUser")]
+    partial class IsBlockedUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,34 +26,23 @@ namespace PaymentSystem.Migrations
 
             modelBuilder.Entity("PaymentSystem.Data.BalanceRecord", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("UserId")
                         .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnName("user_id");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasKey("UserId");
 
                     b.ToTable("balances");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Amount = 1000m,
-                            UserId = 2
+                            UserId = 1,
+                            Amount = 1000m
                         });
                 });
 
@@ -176,7 +167,7 @@ namespace PaymentSystem.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_blocked");
 
-                    b.Property<bool>("IsVerified")
+                    b.Property<bool?>("IsVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("is_verified");
 
@@ -185,6 +176,10 @@ namespace PaymentSystem.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)")
                         .HasColumnName("last_name");
+
+                    b.Property<string>("PassportData")
+                        .HasColumnType("text")
+                        .HasColumnName("Passport_data");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -203,14 +198,14 @@ namespace PaymentSystem.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 2,
+                            Id = 1,
                             Email = "admin@gmail.com",
                             FirstName = "admin",
                             IsBlocked = false,
-                            IsVerified = false,
+                            IsVerified = true,
                             LastName = "admin",
                             Password = "admin1234",
-                            RegisteredAt = new DateTime(2022, 3, 29, 10, 17, 56, 249, DateTimeKind.Utc).AddTicks(9794)
+                            RegisteredAt = new DateTime(2022, 3, 22, 9, 44, 33, 120, DateTimeKind.Utc).AddTicks(3923)
                         });
                 });
 
@@ -244,54 +239,14 @@ namespace PaymentSystem.Migrations
                         {
                             Id = 1,
                             RoleId = 2,
-                            UserId = 2
+                            UserId = 1
                         });
-                });
-
-            modelBuilder.Entity("PaymentSystem.Data.VerificationTransferRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ConfirmedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("confirmed_at");
-
-                    b.Property<int?>("ConfirmedBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("confirmed_by");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("PassportData")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Passport_data");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConfirmedBy");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("verification_transfers");
                 });
 
             modelBuilder.Entity("PaymentSystem.Data.BalanceRecord", b =>
                 {
                     b.HasOne("PaymentSystem.Data.UserRecord", "UserRecord")
-                        .WithOne("Balance")
+                        .WithOne()
                         .HasForeignKey("PaymentSystem.Data.BalanceRecord", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -344,24 +299,6 @@ namespace PaymentSystem.Migrations
                     b.Navigation("UserRecord");
                 });
 
-            modelBuilder.Entity("PaymentSystem.Data.VerificationTransferRecord", b =>
-                {
-                    b.HasOne("PaymentSystem.Data.UserRecord", "ConfirmedByUser")
-                        .WithMany("VerificationTransfersConfirmedBy")
-                        .HasForeignKey("ConfirmedBy")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("PaymentSystem.Data.UserRecord", "User")
-                        .WithOne("VerificationTransfer")
-                        .HasForeignKey("PaymentSystem.Data.VerificationTransferRecord", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ConfirmedByUser");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("PaymentSystem.Data.RoleRecord", b =>
                 {
                     b.Navigation("UserRoleRecords");
@@ -369,9 +306,6 @@ namespace PaymentSystem.Migrations
 
             modelBuilder.Entity("PaymentSystem.Data.UserRecord", b =>
                 {
-                    b.Navigation("Balance")
-                        .IsRequired();
-
                     b.Navigation("FundTransferConfirmedBy");
 
                     b.Navigation("FundTransferCreatedBy");
@@ -379,11 +313,6 @@ namespace PaymentSystem.Migrations
                     b.Navigation("FundTransfers");
 
                     b.Navigation("UserRoleRecords");
-
-                    b.Navigation("VerificationTransfer")
-                        .IsRequired();
-
-                    b.Navigation("VerificationTransfersConfirmedBy");
                 });
 #pragma warning restore 612, 618
         }

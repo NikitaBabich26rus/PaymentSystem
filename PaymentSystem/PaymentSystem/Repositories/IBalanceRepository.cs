@@ -6,5 +6,5 @@ public interface IBalanceRepository
 {
     Task CreateBalanceForUserAsync(BalanceRecord balanceRecord);
 
-    Task<decimal> GetUserBalance(int userId);
+    ValueTask<decimal> GetUserBalanceAsync(int userId);
 }
