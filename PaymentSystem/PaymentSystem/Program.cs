@@ -23,21 +23,21 @@ builder.Services.AddAuthentication("Cookie")
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", authorizationPolicyBuilder =>
+    options.AddPolicy("Admin", policy =>
     {
-        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "Admin");
+        policy.RequireClaim(ClaimTypes.Role, "Admin");
     });
-    options.AddPolicy("User", authorizationPolicyBuilder =>
+    options.AddPolicy("User", policy =>
     {
-        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "User");
+        policy.RequireClaim(ClaimTypes.Role, "User");
     });
-    options.AddPolicy("KYC-Manager", authorizationPolicyBuilder =>
+    options.AddPolicy("KYC-Manager", policy =>
     {
-        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "KYC-Manager");
+        policy.RequireClaim(ClaimTypes.Role, "KYC-Manager");
     });
-    options.AddPolicy("Funds-Manager", authorizationPolicyBuilder =>
+    options.AddPolicy("Funds-Manager", policy =>
     {
-        authorizationPolicyBuilder.RequireClaim(ClaimTypes.Role, "Funds-Manager");
+        policy.RequireClaim(ClaimTypes.Role, "Funds-Manager");
     });
 });
 
