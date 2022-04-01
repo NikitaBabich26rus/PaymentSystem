@@ -67,7 +67,6 @@ public class VerificationRepository: IVerificationRepository
             .Include(v => v.User)
             .Include(v => v.ConfirmedByUser)
             .ToListAsync();
-
     private async ValueTask<VerificationTransferRecord?> GetVerificationByIdAsync(int id)
         => await _paymentSystemContext.VerificationTransfers
             .FirstOrDefaultAsync(v => v.Id == id);

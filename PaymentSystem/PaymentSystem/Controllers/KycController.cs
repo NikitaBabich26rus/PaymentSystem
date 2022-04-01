@@ -2,19 +2,15 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentSystem.Repositories;
-using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
 
 public class KycController: Controller
 {
-    private readonly AccountService _accountService;
     private readonly IVerificationRepository _verificationRepository;
     
-    public KycController(AccountService accountService,
-        IVerificationRepository verificationRepository)
+    public KycController(IVerificationRepository verificationRepository)
     {
-        _accountService = accountService;
         _verificationRepository = verificationRepository;
     }
 

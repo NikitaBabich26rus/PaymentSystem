@@ -41,7 +41,7 @@ public class AccountService
             RegisteredAt = user.RegisteredAt,
             IsVerified = user.IsVerified,
             IsBlocked = user.IsBlocked,
-            Balance = userBalance,
+            Balance = userBalance.Amount,
             Role = userRole
         };
         return userProfile;
@@ -121,7 +121,7 @@ public class AccountService
                 RegisteredAt = user.UserRecord.RegisteredAt,
                 IsVerified = user.UserRecord.IsVerified,
                 IsBlocked = user.UserRecord.IsBlocked,
-                Balance = userBalance,
+                Balance = userBalance.Amount,
                 Role = user.RoleRecord.Name
             });
         }

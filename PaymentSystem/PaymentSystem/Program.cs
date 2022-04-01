@@ -48,6 +48,7 @@ builder.Services.AddScoped<RolesService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
 builder.Services.AddScoped<BalanceService>();
+builder.Services.AddScoped<IFundsRepository, FundsRepository>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

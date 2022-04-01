@@ -126,7 +126,7 @@ public class AccountController: Controller
         };
         return editUserProfile;
     }
-    
+
     private int GetUserId()
     {
         Int32.TryParse(HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value, out var id);

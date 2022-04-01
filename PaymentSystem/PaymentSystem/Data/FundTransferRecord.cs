@@ -13,6 +13,10 @@ namespace PaymentSystem.Data
         [Required]
         public int UserId { get; set; }
         
+        [Column("amount_of_money")]
+        [Required]
+        public decimal AmountOfMoney { get; set; }
+        
         [Column("card_number")]
         [Required]
         public string CardNumber { get; set; }
@@ -38,6 +42,10 @@ namespace PaymentSystem.Data
         
         [Column("confirmed_at")]
         public DateTime? ConfirmedAt { get; set; }
+        
+        [Column("transfer_type")]
+        [Required]
+        public TransferType TransferType { get; set; }
         
         public virtual UserRecord? ConfirmedByUserRecord { get; set; }
         

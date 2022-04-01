@@ -11,14 +11,13 @@ public class BalanceRepository: IBalanceRepository
     {
         _paymentSystemContext = paymentSystemContext;
     }
+    
+    
+    public async ValueTask<BalanceRecord?> GetUserBalanceAsync(int userId)
+        => await _paymentSystemContext.Balances.FirstOrDefaultAsync(x => x.UserId == userId);
+        
 
-    public async ValueTask<decimal> GetUserBalanceAsync(int userId)
-    {
-        var balance = await _paymentSystemContext.Balances.FirstOrDefaultAsync(x => x.UserId == userId);
-        return balance!.Amount;
-    }
-
-    public async Task CreateBalanceForUserAsync(BalanceRecord balanceRecord)
+        public async Task CreateBalanceForUserAsync(BalanceRecord balanceRecord)
     {
         await _paymentSystemContext.Balances.AddAsync(balanceRecord);
         await _paymentSystemContext.SaveChangesAsync();

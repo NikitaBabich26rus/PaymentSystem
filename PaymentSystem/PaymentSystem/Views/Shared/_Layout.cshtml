@@ -24,6 +24,9 @@
             <div class="d-flex flex-row">
                 @if ((await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
                 {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
+                        Verified fund transfers
+                    </a>
                     <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
                         Verified users
                     </a>
@@ -38,6 +41,27 @@
                     </a>
                     <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifyUsers">
                         Verify users
+                    </a>
+                }
+                @if ((await _authorizationService.AuthorizeAsync(User, "Funds-Manager")).Succeeded)
+                {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
+                        Verified fund transfers
+                    </a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="UnverifiedFundTransfers">
+                        Unverified fund transfers
+                    </a>
+                }
+                @if ((await _authorizationService.AuthorizeAsync(User, "User")).Succeeded)
+                {
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="UserFundTransfers">
+                        Fund transfers
+                    </a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="CreateDeposit">
+                        Deposit money
+                    </a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="CreateWithdrawal">
+                        Withdrawal money
                     </a>
                 }
                 @if (!User.Identity!.IsAuthenticated)
