@@ -1,0 +1,68 @@
+@model List<PaymentSystem.Data.FundTransferRecord>
+
+<div>
+    <h4 style="margin-top: 40px">
+        Unverified fund transfers.
+    </h4>
+    <table class="table table-striped" style="margin-top: 30px">
+        <tr>
+            <th>Card number</th>
+            <th>Transfer type</th>
+            <th>Created at</th>
+            <th>amount of money</th>
+        </tr>
+        <tbody>
+        @foreach (var fundTransfer in Model)
+        {
+            if (fundTransfer.ConfirmedBy == null)
+            {
+                <tr>
+                    <td>@fundTransfer.CardNumber</td>
+                    <td>@fundTransfer.TransferType</td>
+                    <td>@fundTransfer.CreatedAt</td>
+                    <td>@fundTransfer.AmountOfMoney</td>
+                    <td>
+                         <button
+                            type="button"
+                            class="btn btn-danger"
+                            onclick="location.href='@Url.Action("RejectFundTransfer", "Funds", new {fundTransferId = fundTransfer.Id})'"
+                         >
+                            Сancel
+                        </button>
+                    </td>
+                </tr>   
+            }
+        }
+        </tbody>
+    </table>
+    
+    <h4 style="margin-top: 40px">
+            Verified fund transfers.
+    </h4>
+    <table class="table table-striped" style="margin-top: 30px">
+        <tr>
+            <th>Card number</th>
+            <th>Transfer type</th>
+            <th>Created at</th>
+            <th>Amount of money</th>
+            <th>Confirmed by</th>
+            <th>Confirmed at</th>
+        </tr>
+        <tbody>
+        @foreach (var fundTransfer in Model)
+        {
+            if (fundTransfer.ConfirmedBy != null)
+            {
+                <tr>
+                    <td>@fundTransfer.CardNumber</td>
+                    <td>@fundTransfer.TransferType</td>
+                    <td>@fundTransfer.CreatedAt</td>
+                    <td>@fundTransfer.AmountOfMoney</td>
+                    <td>@fundTransfer.ConfirmedByUserRecord!.FirstName @fundTransfer.ConfirmedByUserRecord!.LastName</td>
+                    <td>@fundTransfer.ConfirmedAt</td>
+                </tr>   
+            }
+        }
+        </tbody>
+    </table>
+</div>

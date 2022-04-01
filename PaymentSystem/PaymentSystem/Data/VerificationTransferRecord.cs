@@ -27,7 +27,7 @@ public class VerificationTransferRecord
     
     [Column("confirmed_at")]
     public DateTime? ConfirmedAt { get; set; }
-    
+
     public virtual UserRecord User { get; set; }
     
     public virtual UserRecord ConfirmedByUser { get; set; }

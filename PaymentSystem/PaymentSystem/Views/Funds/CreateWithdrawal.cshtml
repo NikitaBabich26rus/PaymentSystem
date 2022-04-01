@@ -1,0 +1,52 @@
+<div>
+    <div class="d-flex justify-content-center" style="margin-top: 80px">
+        <div class="col-sm-5">
+            <div style="text-align: center;">
+                <h3>Create withdrawal</h3>
+            </div>
+            <form class="d-flex flex-column" method="post" asp-controller="Funds" asp-action="CreateWithdrawal">
+                @if (@ViewBag.Error != null)
+                {
+                    <div style="color: red; text-align: center;">
+                        @ViewBag.Error
+                    </div>    
+                }
+                <input
+                    type="text"
+                    required
+                    maxlength="16"
+                    placeholder="Card number"
+                    name="CardNumber"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input
+                    type="text"
+                    required
+                    maxlength="4"
+                    placeholder="Card date"
+                    name="CardDate"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input
+                    type="text"
+                    required
+                    maxlength="3"
+                    placeholder="Card cvc"
+                    name="CardCvc"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <input
+                    type="text"
+                    required
+                    maxlength="20"
+                    placeholder="amount of money"
+                    name="AmountOfMoney"
+                    style="margin: 5px 0; height: 40px;"
+                />
+                <button class="btn btn-primary" style="margin: 5px 0; height: 40px;">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

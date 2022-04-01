@@ -1,0 +1,48 @@
+@model List<PaymentSystem.Data.FundTransferRecord>
+
+<div>
+     <h4 style="margin-top: 40px">
+         Unverified fund transfers.
+    </h4>
+    <table class="table table-striped" style="margin-top: 30px">
+        <tr>
+            <th>Card number</th>
+            <th>Transfer type</th>
+            <th>Created at</th>
+            <th>Amount of money</th>
+            <th>From user</th>
+            <th>To user</th>
+        </tr>
+        <tbody>
+        @foreach (var fundTransfer in Model)
+        {
+            <tr>
+                <td>@fundTransfer.CardNumber</td>
+                <td>@fundTransfer.TransferType</td>
+                <td>@fundTransfer.CreatedAt</td>
+                <td>@fundTransfer.AmountOfMoney</td>
+                <td>@fundTransfer.CreatedByUserRecord.FirstName @fundTransfer.CreatedByUserRecord.LastName</td>
+                <td>@fundTransfer.UserRecord.FirstName @fundTransfer.UserRecord.LastName</td>
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        onclick="location.href='@Url.Action("AcceptFundTransfer", "Funds", new {fundTransferId = fundTransfer.Id})'"
+                    >
+                        Accept
+                    </button>
+                </td>
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        onclick="location.href='@Url.Action("RejectFundTransfer", "Funds", new {fundTransferId = fundTransfer.Id})'"
+                    >
+                        Reject
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

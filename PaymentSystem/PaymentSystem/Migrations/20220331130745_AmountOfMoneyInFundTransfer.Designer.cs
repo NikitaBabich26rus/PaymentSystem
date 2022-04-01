@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentSystem.Data;
@@ -11,9 +12,10 @@ using PaymentSystem.Data;
 namespace PaymentSystem.Migrations
 {
     [DbContext(typeof(PaymentSystemContext))]
-    partial class PaymentSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20220331130745_AmountOfMoneyInFundTransfer")]
+    partial class AmountOfMoneyInFundTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,10 +100,6 @@ namespace PaymentSystem.Migrations
                     b.Property<int>("CreatedBy")
                         .HasColumnType("integer")
                         .HasColumnName("created_by");
-
-                    b.Property<int>("TransferType")
-                        .HasColumnType("integer")
-                        .HasColumnName("transfer_type");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
@@ -218,7 +216,7 @@ namespace PaymentSystem.Migrations
                             IsVerified = false,
                             LastName = "admin",
                             Password = "admin1234",
-                            RegisteredAt = new DateTime(2022, 4, 1, 9, 20, 5, 827, DateTimeKind.Utc).AddTicks(5827)
+                            RegisteredAt = new DateTime(2022, 3, 31, 13, 7, 44, 685, DateTimeKind.Utc).AddTicks(9272)
                         });
                 });
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentSystem.Models;
+using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
@@ -10,11 +11,11 @@ namespace PaymentSystem.Controllers;
 public class AuthController: Controller
 {
     private readonly AccountService _accountService;
-    private readonly RolesService _rolesService;
+    private readonly IRolesRepository _rolesRepository;
     
-    public AuthController(AccountService accountService, RolesService rolesService)
+    public AuthController(AccountService accountService, IRolesRepository rolesRepository)
     {
-        _rolesService = rolesService;
+        _rolesRepository = rolesRepository;
         _accountService = accountService;
     }
     
@@ -54,7 +55,7 @@ public class AuthController: Controller
                 return View("Login");
             }
             
-            var userRole = await _rolesService.GetUserRoleAsync(user.Id);
+            var userRole = await _rolesRepository.GetUserRolesAsync(user.Id);
             await AddCookie(user.Id, userRole);
             return Redirect("/");
         }
@@ -77,7 +78,7 @@ public class AuthController: Controller
             }
             
             var userId = await _accountService.CreateUserAsync(registerModel);
-            var userRole = await _rolesService.GetUserRoleAsync(userId);
+            var userRole = await _rolesRepository.GetUserRolesAsync(userId);
             await AddCookie(userId, userRole);
             return Redirect("/");
         }
