@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Repositories;
 
 namespace PaymentSystem.Controllers;
@@ -15,7 +16,7 @@ public class KycController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "KYC-Manager")]
+    [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> VerifyUsers()
     {
         var verifications = await _verificationRepository.GetVerifyUsersAsync();
@@ -23,7 +24,7 @@ public class KycController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "KYC-Manager")]
+    [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> AcceptUserVerification(int verificationId)
     {
         var kycManagerId = GetKycManagerId();
@@ -32,7 +33,7 @@ public class KycController: Controller
     }
     
     [HttpGet]
-    [Authorize(Policy = "KYC-Manager")]
+    [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> RejectUserVerification(int verificationId)
     {   
         await _verificationRepository.RejectUserVerificationAsync(verificationId);
@@ -40,10 +41,10 @@ public class KycController: Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin, KYC-Manager")]
+    [Authorize(Roles = $"{Roles.AdminRole}, {Roles.KycManagerRole}")]
     public async Task<IActionResult> VerifiedUsers()
     {
-        var verifications = await _verificationRepository.GetVerifiedUsers();
+        var verifications = await _verificationRepository.GetVerifiedUsers().ToListAsync();
         return View("VerifiedUsers", verifications);
     }
     

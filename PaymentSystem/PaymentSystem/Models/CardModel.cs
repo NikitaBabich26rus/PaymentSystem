@@ -4,18 +4,19 @@ namespace PaymentSystem.Models;
 
 public class CardModel
 {
-    [MaxLength(16)]
-    [MinLength(16)]
+    [Required]
+    [RegularExpression(CardValidation.CardNumberRegularExpression, ErrorMessage = "Invalid card number")]
     public string CardNumber { get; set; }
 
-    [MaxLength(3)]
-    [MinLength(3)]
+    [Required]
+    [RegularExpression(CardValidation.CardCvcRegularExpression, ErrorMessage = "Invalid card cvc")]
     public string CardCvc { get; set; }
     
-    [MaxLength(4)]
-    [MinLength(4)]
+    [Required]
+    [RegularExpression(CardValidation.CardDateRegularExpression, ErrorMessage = "Invalid card date")]
     public string CardDate { get; set; }
     
-    [MaxLength(20)]
-    public string AmountOfMoney { get; set; }
+    [Required]
+    [Range(0.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
+    public decimal AmountOfMoney { get; set; }
 }

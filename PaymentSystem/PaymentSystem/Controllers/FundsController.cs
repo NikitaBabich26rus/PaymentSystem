@@ -16,28 +16,26 @@ public class FundsController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public IActionResult CreateDeposit()
     {
         return View("CreateDeposit");
     } 
     
     [HttpPost]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = Roles.UserRole)]
     public async Task<IActionResult> CreateDeposit(CardModel card)
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             return View("CreateDeposit");
         }
-
-        if (!IsCardValid(card))
-        {
-            ViewBag.Error = "Validation error";
-            return View("CreateDeposit");
-        }
-
+        
         var userId = GetUserId();
         await _fundsRepository.CreateDepositAsync(card, userId, userId);
         
@@ -45,25 +43,23 @@ public class FundsController: Controller
     }
     
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public IActionResult CreateWithdrawal()
     {
         return View("CreateWithdrawal");
     } 
     
     [HttpPost]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public async Task<IActionResult> CreateWithdrawal(CardModel card)
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
-            return View("CreateWithdrawal");
-        }
-
-        if (!IsCardValid(card))
-        {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             return View("CreateWithdrawal");
         }
 
@@ -74,7 +70,7 @@ public class FundsController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public async Task<IActionResult> UserFundTransfers()
     {
         var userId = GetUserId();
@@ -83,7 +79,7 @@ public class FundsController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "Funds-Manager")]
+    [Authorize(Policy = Roles.FundsManagerRole)]
     public async Task<IActionResult> UnverifiedFundTransfers()
     {
         var fundTransfers = await _fundsRepository.GetUnverifiedFundTransfers();
@@ -91,7 +87,7 @@ public class FundsController: Controller
     }
     
     [HttpGet]
-    [Authorize(Roles = "Funds-Manager, Admin")]
+    [Authorize(Roles = $"{Roles.FundsManagerRole}, {Roles.AdminRole}")]
     public async Task<IActionResult> VerifiedFundTransfers()
     {
         var fundTransfers = await _fundsRepository.GetVerifiedFundTransfers();
@@ -99,7 +95,7 @@ public class FundsController: Controller
     }
     
     [HttpGet]
-    [Authorize(Policy = "Funds-Manager")]
+    [Authorize(Policy = Roles.FundsManagerRole)]
     public async Task<IActionResult> AcceptFundTransfer(int fundTransferId)
     {
         var fundManagerId = GetUserId();
@@ -108,30 +104,20 @@ public class FundsController: Controller
     }
     
     [HttpGet]
-    [Authorize(Roles = "Funds-Manager, User")]
+    [Authorize(Roles = $"{Roles.FundsManagerRole}, {Roles.UserRole}")]
     public async Task<IActionResult> RejectFundTransfer(int fundTransferId)
     {
         await _fundsRepository.DeleteFundTransferAsync(fundTransferId);
-        
         var userRole = GetUserRole();
-        if (userRole == "Funds-Manager")
+        
+        if (userRole == Roles.FundsManagerRole)
         {
             return Redirect("/Funds/UnverifiedFundTransfers");   
         }
         
         return Redirect("/Funds/UserFundTransfers");
     }
-    
-    private bool IsCardValid(CardModel card)
-    {
-        var isValidCsv = int.TryParse(card.CardCvc, out var csv);
-        var isValidCardNumber = long.TryParse(card.CardNumber, out var cardNumber);
-        var isValidCardDate = int.TryParse(card.CardDate, out var cardDate);
-        var isValidAmountOfMoney = decimal.TryParse(card.CardNumber, out var amountOfMoney);
 
-        return isValidCsv && isValidCardDate && isValidCardNumber && isValidAmountOfMoney;
-    }
-    
     private int GetUserId()
     {
         Int32.TryParse(HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value, out var id);

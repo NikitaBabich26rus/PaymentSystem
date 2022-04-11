@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PaymentSystem.Data;
 
-[Table("verification_transfers")]
-public class VerificationTransferRecord
+[Table("verifications")]
+public class VerificationRecord
 {
     [Column("id")]
     [Key]

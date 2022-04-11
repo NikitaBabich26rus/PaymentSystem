@@ -4,22 +4,22 @@ namespace PaymentSystem.Models;
 
 public class RegisterModel
 {
-    [Required(ErrorMessage = "Не указано имя")]
+    [Required(ErrorMessage = "No first name listed.")]
     public string FirstName { get; set; }
     
-    [Required(ErrorMessage = "Не указана фамилия")]
+    [Required(ErrorMessage = "No last name listed.")]
     public string LastName { get; set; }
     
-    [Required(ErrorMessage = "Не указан Email")]
-    [RegularExpression(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}", ErrorMessage = "Некорректный адрес")]
+    [Required(ErrorMessage = "No email listed.")]
+    [DataType(DataType.EmailAddress, ErrorMessage = "Incorrect email.")]
     public string Email { get; set; }
          
-    [Required(ErrorMessage = "Не указан пароль")]
+    [Required(ErrorMessage = "No password listed.")]
     [DataType(DataType.Password)]
     [StringLength(30, MinimumLength = 6)]
     public string Password { get; set; }
          
     [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Неверное подтверждение пароля")]
+    [Compare("Password", ErrorMessage = "Incorrect password confirmation.")]
     public string ConfirmPassword { get; set; }
 }

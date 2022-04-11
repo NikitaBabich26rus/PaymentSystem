@@ -7,19 +7,19 @@ namespace PaymentSystem.Services;
 public class AccountService
 {
     private readonly IAccountRepository _accountRepository;
-    private readonly RolesService _rolesService;
-    private readonly BalanceService _balanceService;
+    private readonly IRolesRepository _rolesRepository;
+    private readonly IBalanceRepository _balanceRepository;
     private readonly IVerificationRepository _verificationRepository;
-    
+
     public AccountService(
         IAccountRepository accountRepository,
-        RolesService rolesService,
-        BalanceService balanceService,
+        IRolesRepository rolesRepository,
+        IBalanceRepository balanceRepository,
         IVerificationRepository verificationRepository)
     {
         _accountRepository = accountRepository;
-        _rolesService = rolesService;
-        _balanceService = balanceService;
+        _rolesRepository = rolesRepository;
+        _balanceRepository = balanceRepository;
         _verificationRepository = verificationRepository;
     }
 
@@ -29,8 +29,14 @@ public class AccountService
     public async ValueTask<UserProfileModel> GetUserProfileAsync(int userId)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
-        var userRole = await _rolesService.GetUserRoleAsync(userId);
-        var userBalance = await _balanceService.GetUserBalanceAsync(userId);
+        var userRole = await _rolesRepository.GetUserRoleAsync(userId);
+        
+        var balance = await _balanceRepository.GetUserBalanceAsync(userId);
+
+        if (balance == null)
+        {
+            throw new ArgumentException($"No balance was found for the user with id: {userId}.");
+        }
 
         var userProfile = new UserProfileModel()
         {
@@ -41,9 +47,10 @@ public class AccountService
             RegisteredAt = user.RegisteredAt,
             IsVerified = user.IsVerified,
             IsBlocked = user.IsBlocked,
-            Balance = userBalance.Amount,
+            Balance = balance.Amount,
             Role = userRole
         };
+        
         return userProfile;
     }
 
@@ -62,11 +69,6 @@ public class AccountService
         };
         
         var userId = await _accountRepository.CreateUserAsync(newUser);
-        await Task.WhenAll
-        (
-            _rolesService.AddUserRoleAsync(userId, 1),
-            _balanceService.CreateBalanceForUserAsync(userId)
-        );
         
         return userId;
     }
@@ -90,14 +92,14 @@ public class AccountService
         user.FirstName = updateUser.FirstName;
         user.LastName = updateUser.LastName;
         user.IsBlocked = updateUser.Status != "Active";
-        await _rolesService.UpdateUserRoleAsync(updateUser.Role, userId);
+        await _rolesRepository.UpdateUserRoleAsync(updateUser.Role, userId);
         await _accountRepository.UpdateUserAsync(user);
     }
 
     public async Task VerifyUserAsync(int userId, string passportData)
         => await _verificationRepository.VerifyUserAsync(userId, passportData);
 
-    public async ValueTask<VerificationTransferRecord?> GetUserVerificationAsync(int userId)
+    public async ValueTask<VerificationRecord?> GetUserVerificationAsync(int userId)
         => await _verificationRepository.GetVerificationByUserIdAsync(userId);
 
     public async Task<List<UserProfileModel>> GetUsersProfiles()
@@ -108,9 +110,11 @@ public class AccountService
         foreach (var user in users)
         {
             if (user.RoleRecord.Name == "Admin")
-                continue;
-            
-            var userBalance = await _balanceService.GetUserBalanceAsync(user.UserRecord.Id);
+            {
+                continue;   
+            }
+
+            var userBalance = await _balanceRepository.GetUserBalanceAsync(user.UserRecord.Id);
 
             usersProfiles.Add(new UserProfileModel()
             {

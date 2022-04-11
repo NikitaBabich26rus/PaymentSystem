@@ -6,11 +6,8 @@ namespace PaymentSystem.Data
     [Table("user_roles")]
     public class UserRoleRecord
     {
-        [Column("id")]
-        public int Id { get; set; }
-        
         [Column("user_id")]
-        [Required]
+        [Key]
         public int UserId { get; set; }
         
         [Column("role_id")]

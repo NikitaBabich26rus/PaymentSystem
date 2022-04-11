@@ -13,16 +13,33 @@ public class AccountRepository : IAccountRepository
     }
 
     public async ValueTask<UserRecord?> GetUserByEmailAsync(string email)
-        => await _paymentSystemContext.Users.FirstOrDefaultAsync(user => user.Email == email);
+        => await _paymentSystemContext.Users.SingleOrDefaultAsync(user => user.Email == email);
 
     public async ValueTask<UserRecord?> GetUserByIdAsync(int userId)
-        => await _paymentSystemContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        => await _paymentSystemContext.Users.SingleOrDefaultAsync(user => user.Id == userId);
 
     public async Task<int> CreateUserAsync(UserRecord newUserRecord)
     {
-        await _paymentSystemContext.Users.AddAsync(newUserRecord);
+        var user  = await _paymentSystemContext.Users.AddAsync(newUserRecord);
         await _paymentSystemContext.SaveChangesAsync();
-        return newUserRecord.Id;
+        var userId = newUserRecord.Id;
+        
+
+        var userRole = new UserRoleRecord()
+        {
+            UserId = userId,
+            RoleId = 1
+        };
+        await _paymentSystemContext.AddAsync(userRole);
+        
+        var balanceRecord = new BalanceRecord()
+        {
+            UserId = userId,
+        };
+        await _paymentSystemContext.Balances.AddAsync(balanceRecord);
+        
+        await _paymentSystemContext.SaveChangesAsync();
+        return userId;
     }
 
     public async Task DeleteUserAsync(UserRecord userRecord)

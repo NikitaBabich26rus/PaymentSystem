@@ -19,14 +19,13 @@ public class FundsRepository: IFundsRepository
 
     public async Task CreateDepositAsync(CardModel card, int createdByUserId, int createdToUserId)
     {
-        decimal.TryParse(card.AmountOfMoney, out var amountOfMoney);
         var fundTransfer = new FundTransferRecord()
         {
             UserId = createdToUserId,
             CardNumber = card.CardNumber,
             CardCvc = card.CardCvc,
             CardDate  = card.CardDate,
-            AmountOfMoney = amountOfMoney,
+            AmountOfMoney = card.AmountOfMoney,
             CreatedBy = createdByUserId,
             CreatedAt = DateTime.UtcNow,
             TransferType = TransferType.Deposit
@@ -38,14 +37,13 @@ public class FundsRepository: IFundsRepository
 
     public async Task CreateWithdrawalAsync(CardModel card, int createdByUserId, int createdToUserId)
     {
-        decimal.TryParse(card.AmountOfMoney, out var amountOfMoney);
         var fundTransfer = new FundTransferRecord()
         {
             UserId = createdToUserId,
             CardNumber = card.CardNumber,
             CardCvc = card.CardCvc,
             CardDate  = card.CardDate,
-            AmountOfMoney = amountOfMoney,
+            AmountOfMoney = card.AmountOfMoney,
             CreatedBy = createdByUserId,
             CreatedAt = DateTime.UtcNow,
             TransferType = TransferType.Withdrawal
@@ -84,6 +82,7 @@ public class FundsRepository: IFundsRepository
     public async Task AcceptFundTransfer(int fundTransferId, int fundManagerId)
     {
         var fundTransfer = await GetFundTransferAsync(fundTransferId);
+        
         if (fundTransfer == null)
         {
             return;

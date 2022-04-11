@@ -4,7 +4,7 @@ namespace PaymentSystem.Repositories;
 
 public interface IBalanceRepository
 {
-    Task CreateBalanceForUserAsync(BalanceRecord balanceRecord);
+    Task CreateBalanceForUserAsync(int userId);
 
-    ValueTask<BalanceRecord> GetUserBalanceAsync(int userId);
+    ValueTask<BalanceRecord?> GetUserBalanceAsync(int userId);
 }

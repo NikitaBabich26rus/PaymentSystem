@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentSystem.Models;
+using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
@@ -9,14 +10,14 @@ namespace PaymentSystem.Controllers;
 public class AccountController: Controller
 {
     private readonly AccountService _accountService;
-    private readonly RolesService _rolesService;
+    private readonly IRolesRepository _rolesRepository;
 
     public AccountController(
         AccountService accountService,
-        RolesService rolesService)
+        IRolesRepository rolesRepository)
     {
         _accountService = accountService;
-        _rolesService = rolesService;
+        _rolesRepository = rolesRepository;
     }
     
     [HttpGet]
@@ -36,7 +37,11 @@ public class AccountController: Controller
         var userProfile = await _accountService.GetUserProfileAsync(userId);
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             return View("Profile", userProfile);
         }
         
@@ -52,7 +57,7 @@ public class AccountController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = Roles.AdminRole)]
     public async Task<IActionResult> Users()
     {
         var usersProfiles = await _accountService.GetUsersProfiles();
@@ -60,7 +65,7 @@ public class AccountController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = Roles.AdminRole)]
     public async Task<IActionResult> UserProfile(string userId)
     {
         Int32.TryParse(userId, out var id);
@@ -74,13 +79,17 @@ public class AccountController: Controller
     }
     
     [HttpPost]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = Roles.AdminRole)]
     public async Task<IActionResult> UpdateUserProfile(UpdateUserProfileModel userProfile, string id)
     {
         Int32.TryParse(id, out var userId);
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             var editUserProfile = await GetEditUserProfileModel(userId);
             return View("UserProfile", editUserProfile);
         }
@@ -104,10 +113,10 @@ public class AccountController: Controller
     public async Task<IActionResult> VerifyUser(string passportData)
     {
         var userId = GetUserId();
-        if (!Int64.TryParse(passportData, out long passportDataInt))
+        if (!Int64.TryParse(passportData, out _))
         {
             var userVerification = await _accountService.GetUserVerificationAsync(userId);
-            ViewBag.Error = "Validation error";
+            ViewBag.Error = "Incorrect passport data.";
             return View("Verification", userVerification);
         }
         
@@ -118,7 +127,7 @@ public class AccountController: Controller
     private async ValueTask<EditUserProfileModel> GetEditUserProfileModel(int userId)
     {
         var userProfile = await _accountService.GetUserProfileAsync(userId);
-        var roles = await _rolesService.GetRolesAsync();
+        var roles = await _rolesRepository.GetRolesAsync();
         var editUserProfile = new EditUserProfileModel()
         {
             UserProfile = userProfile,

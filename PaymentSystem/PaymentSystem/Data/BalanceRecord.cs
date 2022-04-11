@@ -7,11 +7,8 @@ namespace PaymentSystem.Data
     [Table("balances")]
     public class BalanceRecord
     {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
-        
         [Column("user_id")]
+        [Key]
         public int UserId { get; set; }
         
         [Column("amount")]

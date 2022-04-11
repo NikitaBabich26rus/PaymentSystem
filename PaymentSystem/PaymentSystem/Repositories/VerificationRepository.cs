@@ -18,7 +18,7 @@ public class VerificationRepository: IVerificationRepository
 
     public async Task VerifyUserAsync(int userId, string passportData)
     {
-        var verification = new VerificationTransferRecord()
+        var verification = new VerificationRecord()
         {
             UserId = userId,
             PassportData = passportData,
@@ -29,12 +29,12 @@ public class VerificationRepository: IVerificationRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async ValueTask<VerificationTransferRecord?> GetVerificationByUserIdAsync(int userId)
+    public async ValueTask<VerificationRecord?> GetVerificationByUserIdAsync(int userId)
         => await _paymentSystemContext.VerificationTransfers
             .Include(v => v.User)
             .FirstOrDefaultAsync(v => v.UserId == userId);
     
-    public async ValueTask<List<VerificationTransferRecord>> GetVerifyUsersAsync()
+    public async ValueTask<List<VerificationRecord>> GetVerifyUsersAsync()
         => await _paymentSystemContext.VerificationTransfers
             .Where(v => v.ConfirmedBy == null)
             .Include(v => v.User)
@@ -43,11 +43,22 @@ public class VerificationRepository: IVerificationRepository
     public async Task AcceptUserVerificationAsync(int verificationId, int kycManagerId)
     {
         var verification = await GetVerificationByIdAsync(verificationId);
-        verification!.ConfirmedBy = kycManagerId;
-        verification.ConfirmedAt = DateTime.UtcNow;
-        
+
+        if (verification == null)
+        {
+            throw new ArgumentException("Verification not found by id.");
+        }
+
         var user = await _accountRepository.GetUserByIdAsync(verification.UserId);
-        user!.IsVerified = true;
+
+        if (user == null)
+        {
+            throw new ArgumentException("Verification user not found.");
+        }
+        
+        verification.ConfirmedBy = kycManagerId;
+        verification.ConfirmedAt = DateTime.UtcNow;
+        user.IsVerified = true;
         
         _paymentSystemContext.Entry(user).State = EntityState.Modified;
         _paymentSystemContext.Entry(verification).State = EntityState.Modified;
@@ -57,17 +68,23 @@ public class VerificationRepository: IVerificationRepository
     public async Task RejectUserVerificationAsync(int verificationId)
     {
         var verification = await GetVerificationByIdAsync(verificationId);
-        _paymentSystemContext.VerificationTransfers.Remove(verification!);
+        
+        if (verification == null)
+        {
+            throw new ArgumentException("Verification not found by id.");
+        }
+        
+        _paymentSystemContext.VerificationTransfers.Remove(verification);
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async ValueTask<List<VerificationTransferRecord>> GetVerifiedUsers()
-        => await _paymentSystemContext.VerificationTransfers
+    public IQueryable<VerificationRecord> GetVerifiedUsers()
+        => _paymentSystemContext.VerificationTransfers
             .Where(v => v.ConfirmedBy != null)
             .Include(v => v.User)
-            .Include(v => v.ConfirmedByUser)
-            .ToListAsync();
-    private async ValueTask<VerificationTransferRecord?> GetVerificationByIdAsync(int id)
+            .Include(v => v.ConfirmedByUser);
+    
+    private async ValueTask<VerificationRecord?> GetVerificationByIdAsync(int id)
         => await _paymentSystemContext.VerificationTransfers
-            .FirstOrDefaultAsync(v => v.Id == id);
+            .SingleOrDefaultAsync(v => v.Id == id);
 }

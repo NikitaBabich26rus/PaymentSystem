@@ -45,9 +45,9 @@ namespace PaymentSystem.Data
         
         public BalanceRecord Balance { get; set; }
         
-        public VerificationTransferRecord VerificationTransfer { get; set; }
+        public VerificationRecord Verification { get; set; }
         
-        public List<VerificationTransferRecord> VerificationTransfersConfirmedBy { get; set; }
+        public List<VerificationRecord> VerificationTransfersConfirmedBy { get; set; }
         
         public List<UserRoleRecord> UserRoleRecords { get; set; }
         

@@ -11,7 +11,7 @@ namespace PaymentSystem.Data
         
         public DbSet<BalanceRecord> Balances { get; set; }
         
-        public DbSet<VerificationTransferRecord> VerificationTransfers { get; set; }
+        public DbSet<VerificationRecord> VerificationTransfers { get; set; }
 
         public DbSet<FundTransferRecord> FundTransfers { get; set; }
         public DbSet<RoleRecord> Roles { get; set; }
@@ -20,7 +20,6 @@ namespace PaymentSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<BalanceRecord>()
                 .HasOne(b => b.UserRecord)
                 .WithOne(u => u.Balance)
@@ -57,13 +56,13 @@ namespace PaymentSystem.Data
                 .HasForeignKey(f => f.ConfirmedBy)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<VerificationTransferRecord>()
+            modelBuilder.Entity<VerificationRecord>()
                 .HasOne(v => v.User)
-                .WithOne(u => u.VerificationTransfer)
-                .HasForeignKey<VerificationTransferRecord>(f => f.UserId)
+                .WithOne(u => u.Verification)
+                .HasForeignKey<VerificationRecord>(f => f.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<VerificationTransferRecord>()
+            modelBuilder.Entity<VerificationRecord>()
                 .HasOne(v => v.ConfirmedByUser)
                 .WithMany(u => u.VerificationTransfersConfirmedBy)
                 .HasForeignKey(v => v.ConfirmedBy)
@@ -94,7 +93,6 @@ namespace PaymentSystem.Data
             (
                 new
                 {
-                    Id = 1,
                     UserId = 2,
                     Amount = 1000m
                 }
@@ -104,7 +102,6 @@ namespace PaymentSystem.Data
             (
                 new 
                 {
-                    Id = 1,
                     UserId = 2,
                     RoleId = 2
                 }

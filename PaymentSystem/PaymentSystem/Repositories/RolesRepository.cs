@@ -18,13 +18,25 @@ public class RolesRepository: IRolesRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async ValueTask<string> GetUserRolesAsync(int userId)
+    public async ValueTask<string> GetUserRoleAsync(int userId)
     {
         var userRole = await _paymentSystemContext.UserRoles
-            .FirstOrDefaultAsync(x => x.UserId == userId);
+            .SingleOrDefaultAsync(x => x.UserId == userId);
+
+        if (userRole == null)
+        {
+            throw new NullReferenceException($"No role was found for the user with id: {userId}.");
+        }
+        
         var role = await _paymentSystemContext.Roles
-            .FirstOrDefaultAsync(x => x.Id == userRole!.RoleId);
-        return role!.Name;
+            .SingleOrDefaultAsync(x => x.Id == userRole.RoleId);
+
+        if (role == null)
+        {
+            throw new NullReferenceException($"No role was found for the user with id: {userId}.");
+        }
+        
+        return role.Name;
     }
 
     public async Task UpdateUserRoleAsync(string roleName, int userId)

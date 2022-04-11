@@ -4,19 +4,19 @@ namespace PaymentSystem.Models;
 
 public class UpdateUserProfileModel
 {
-    [Required(ErrorMessage = "Не указано имя")]
+    [Required(ErrorMessage = "No first name listed.")]
     public string FirstName { get; set; }
     
-    [Required(ErrorMessage = "Не указана фамилия")]
+    [Required(ErrorMessage = "No last name listed.")]
     public string LastName { get; set; }
     
-    [Required(ErrorMessage = "Не указан Email")]
-    [RegularExpression(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}", ErrorMessage = "Некорректный адрес")]
+    [Required(ErrorMessage = "No email listed.")]
+    [DataType(DataType.EmailAddress, ErrorMessage = "Incorrect email.")]
     public string Email { get; set; }
     
-    [Required(ErrorMessage = "Не указанa роль")]
+    [Required(ErrorMessage = "No role listed.")]
     public string Role { get; set; }
     
-    [Required(ErrorMessage = "Не указан статус")]
+    [Required(ErrorMessage = "No status listed.")]
     public string Status { get; set; }
 }

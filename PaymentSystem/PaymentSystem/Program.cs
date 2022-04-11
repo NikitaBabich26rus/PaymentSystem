@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using PaymentSystem;
 using PaymentSystem.Data;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
@@ -23,31 +24,29 @@ builder.Services.AddAuthentication("Cookie")
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy =>
+    options.AddPolicy(Roles.AdminRole, policy =>
     {
-        policy.RequireClaim(ClaimTypes.Role, "Admin");
+        policy.RequireClaim(ClaimTypes.Role, Roles.AdminRole);
     });
-    options.AddPolicy("User", policy =>
+    options.AddPolicy(Roles.UserRole, policy =>
     {
-        policy.RequireClaim(ClaimTypes.Role, "User");
+        policy.RequireClaim(ClaimTypes.Role, Roles.UserRole);
     });
-    options.AddPolicy("KYC-Manager", policy =>
+    options.AddPolicy(Roles.KycManagerRole, policy =>
     {
-        policy.RequireClaim(ClaimTypes.Role, "KYC-Manager");
+        policy.RequireClaim(ClaimTypes.Role, Roles.KycManagerRole);
     });
-    options.AddPolicy("Funds-Manager", policy =>
+    options.AddPolicy(Roles.FundsManagerRole, policy =>
     {
-        policy.RequireClaim(ClaimTypes.Role, "Funds-Manager");
+        policy.RequireClaim(ClaimTypes.Role, Roles.FundsManagerRole);
     });
 });
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<RolesService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
-builder.Services.AddScoped<BalanceService>();
 builder.Services.AddScoped<IFundsRepository, FundsRepository>();
 
 var app = builder.Build();
