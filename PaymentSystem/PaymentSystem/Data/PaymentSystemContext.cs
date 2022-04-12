@@ -69,10 +69,10 @@ namespace PaymentSystem.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<RoleRecord>().HasData(
-                new { Id = 1, Name = "User" },
-                new { Id = 2, Name = "Admin" },
-                new { Id = 3, Name = "KYC-Manager" },
-                new { Id = 4, Name = "Funds-Manager" }
+                new { Id = 1, Name = PaymentSystem.Roles.UserRole },
+                new { Id = 2, Name = PaymentSystem.Roles.AdminRole },
+                new { Id = 3, Name = PaymentSystem.Roles.KycManagerRole },
+                new { Id = 4, Name = PaymentSystem.Roles.FundsManagerRole }
             );
 
             modelBuilder.Entity<UserRecord>().HasData(

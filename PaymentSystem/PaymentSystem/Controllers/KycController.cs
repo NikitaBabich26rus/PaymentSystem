@@ -3,18 +3,50 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Repositories;
+using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
 
 public class KycController: Controller
 {
     private readonly IVerificationRepository _verificationRepository;
+    private readonly AccountService _accountService;
     
-    public KycController(IVerificationRepository verificationRepository)
+    public KycController(
+        IVerificationRepository verificationRepository,
+        AccountService accountService)
     {
+        _accountService = accountService;
         _verificationRepository = verificationRepository;
     }
 
+    [HttpGet]
+    [Authorize(Policy = Roles.UserRole)]
+    public async Task<IActionResult> Verification()
+    {
+        var userId = GetUserId();
+        var userVerification = await _accountService.GetUserVerificationAsync(userId);
+
+        return View("Verification", userVerification);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Roles.UserRole)]
+    public async Task<IActionResult> VerifyUser(string passportData)
+    {
+        var userId = GetUserId();
+        if (!Int64.TryParse(passportData, out _))
+        {
+            var userVerification = await _accountService.GetUserVerificationAsync(userId);
+            ViewBag.Error = "Incorrect passport data.";
+            return View("Verification", userVerification);
+        }
+        
+        await _accountService.VerifyUserAsync(userId, passportData);
+        return Redirect("/");
+    }
+    
+    
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> VerifyUsers()
@@ -27,7 +59,7 @@ public class KycController: Controller
     [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> AcceptUserVerification(int verificationId)
     {
-        var kycManagerId = GetKycManagerId();
+        var kycManagerId = GetUserId();
         await _verificationRepository.AcceptUserVerificationAsync(verificationId, kycManagerId);
         return Redirect("/Kyc/VerifyUsers");
     }
@@ -48,7 +80,7 @@ public class KycController: Controller
         return View("VerifiedUsers", verifications);
     }
     
-    private int GetKycManagerId()
+    private int GetUserId()
     {
         Int32.TryParse(HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value, out var id);
         return id;

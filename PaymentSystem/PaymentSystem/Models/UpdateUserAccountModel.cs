@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PaymentSystem.Models;
 
-public class UpdateProfileModel
+public class UpdateUserAccountModel
 {
     [Required(ErrorMessage = "No first name listed.")]
     public string FirstName { get; set; }

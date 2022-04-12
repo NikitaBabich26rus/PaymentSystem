@@ -26,12 +26,12 @@ public class AccountController: Controller
     {
         var id = GetUserId();
         var userProfile = await _accountService.GetUserProfileAsync(id);
-        return View("Profile", userProfile);
+        return View("Account", userProfile);
     }
     
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> UpdateProfile(UpdateProfileModel updateProfileModel)
+    public async Task<IActionResult> UpdateProfile(UpdateUserAccountModel updateUserAccountModel)
     {
         var userId = GetUserId();
         var userProfile = await _accountService.GetUserProfileAsync(userId);
@@ -42,17 +42,17 @@ public class AccountController: Controller
                 .Select(x => x.ErrorMessage));
             
             ViewBag.Error = messages;
-            return View("Profile", userProfile);
+            return View("Account", userProfile);
         }
         
         var user = await _accountService.GetUserByIdAsync(userId);
-        if (String.CompareOrdinal(user!.Password, updateProfileModel.OldPassword) != 0)
+        if (String.CompareOrdinal(user!.Password, updateUserAccountModel.OldPassword) != 0)
         {
             ViewBag.Error = "Password error";
-            return View("Profile", userProfile);
+            return View("Account", userProfile);
         }
         
-        await _accountService.UpdateUserAsync(updateProfileModel, user);
+        await _accountService.UpdateUserAccountAsync(updateUserAccountModel, user);
         return Redirect("/");
     }
 
@@ -70,9 +70,10 @@ public class AccountController: Controller
     {
         Int32.TryParse(userId, out var id);
         var editUserProfile = await GetEditUserProfileModel(id);
+        
         if (GetUserId() == id)
         {
-            return View("Profile", editUserProfile.UserProfile);
+            return View("Account", editUserProfile.UserProfile);
         }
         
         return View("UserProfile", editUserProfile);
@@ -94,33 +95,7 @@ public class AccountController: Controller
             return View("UserProfile", editUserProfile);
         }
 
-        await _accountService.UpdateUserByAdminAsync(userProfile, userId);
-        return Redirect("/");
-    }
-
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> Verification()
-    {
-        var userId = GetUserId();
-        var userVerification = await _accountService.GetUserVerificationAsync(userId);
-
-        return View("Verification", userVerification);
-    }
-
-    [HttpPost]
-    [Authorize]
-    public async Task<IActionResult> VerifyUser(string passportData)
-    {
-        var userId = GetUserId();
-        if (!Int64.TryParse(passportData, out _))
-        {
-            var userVerification = await _accountService.GetUserVerificationAsync(userId);
-            ViewBag.Error = "Incorrect passport data.";
-            return View("Verification", userVerification);
-        }
-        
-        await _accountService.VerifyUserAsync(userId, passportData);
+        await _accountService.UpdateUserProfileByAdminAsync(userId, userProfile);
         return Redirect("/");
     }
 

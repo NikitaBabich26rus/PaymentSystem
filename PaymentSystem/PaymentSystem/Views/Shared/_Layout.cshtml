@@ -22,7 +22,7 @@
             </div>
             
             <div class="d-flex flex-row">
-                @if ((await _authorizationService.AuthorizeAsync(User, "Admin")).Succeeded)
+                @if ((await _authorizationService.AuthorizeAsync(User, Roles.AdminRole)).Succeeded)
                 {
                     <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
                         Verified fund transfers
@@ -34,7 +34,7 @@
                         Users
                     </a>
                 }
-                @if ((await _authorizationService.AuthorizeAsync(User, "KYC-Manager")).Succeeded)
+                @if ((await _authorizationService.AuthorizeAsync(User, Roles.KycManagerRole)).Succeeded)
                 {
                     <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
                         Verified users
@@ -43,7 +43,7 @@
                         Verify users
                     </a>
                 }
-                @if ((await _authorizationService.AuthorizeAsync(User, "Funds-Manager")).Succeeded)
+                @if ((await _authorizationService.AuthorizeAsync(User, Roles.FundsManagerRole)).Succeeded)
                 {
                     <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
                         Verified fund transfers
@@ -52,7 +52,7 @@
                         Unverified fund transfers
                     </a>
                 }
-                @if ((await _authorizationService.AuthorizeAsync(User, "User")).Succeeded)
+                @if ((await _authorizationService.AuthorizeAsync(User, Roles.UserRole)).Succeeded)
                 {
                     <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="UserFundTransfers">
                         Fund transfers
@@ -76,7 +76,7 @@
                 else
                 {
                     <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">
-                        Profile
+                        Account
                     </a>
                     <button class="btn btn-light" onclick="location.href='@Url.Action("Logout", "Auth")'">
                         Logout

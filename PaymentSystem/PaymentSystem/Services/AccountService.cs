@@ -76,22 +76,22 @@ public class AccountService
     public async Task DeleteUserAsync(UserRecord userRecord)
         => await _accountRepository.DeleteUserAsync(userRecord);
 
-    public async Task UpdateUserAsync(UpdateProfileModel updateProfileModel, UserRecord user)
+    public async Task UpdateUserAccountAsync(UpdateUserAccountModel updateUserAccountModel, UserRecord user)
     {
-        user.Email = updateProfileModel.Email;
-        user.Password = updateProfileModel.NewPassword;
-        user.FirstName = updateProfileModel.FirstName;
-        user.LastName = updateProfileModel.LastName;
+        user.Email = updateUserAccountModel.Email;
+        user.Password = updateUserAccountModel.NewPassword;
+        user.FirstName = updateUserAccountModel.FirstName;
+        user.LastName = updateUserAccountModel.LastName;
         await _accountRepository.UpdateUserAsync(user);
     }
 
-    public async Task UpdateUserByAdminAsync(UpdateUserProfileModel updateUser, int userId)
+    public async Task UpdateUserProfileByAdminAsync(int userId, UpdateUserProfileModel updateUser)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
         user!.Email = updateUser.Email;
         user.FirstName = updateUser.FirstName;
         user.LastName = updateUser.LastName;
-        user.IsBlocked = updateUser.Status != "Active";
+        user.IsBlocked = updateUser.Status != UserStatus.ActiveStatus;
         await _rolesRepository.UpdateUserRoleAsync(updateUser.Role, userId);
         await _accountRepository.UpdateUserAsync(user);
     }
@@ -109,7 +109,7 @@ public class AccountService
 
         foreach (var user in users)
         {
-            if (user.RoleRecord.Name == "Admin")
+            if (user.RoleRecord.Name == Roles.AdminRole)
             {
                 continue;   
             }

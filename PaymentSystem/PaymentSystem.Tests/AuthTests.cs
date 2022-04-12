@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public class AuthTests
     private AccountService _accountService = null!;
     private RolesRepository _rolesRepository = null!;
 
-    private RegisterModel registerModel = new()
+    private readonly RegisterModel _registerModel = new()
     {
         FirstName = "Ivan",
         LastName = "Ivanov",
@@ -29,17 +30,17 @@ public class AuthTests
     public async Task Setup()
     {
         var options = new DbContextOptionsBuilder<PaymentSystemContext>()
-            .UseInMemoryDatabase(databaseName: "Test")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
         _paymentSystemContext = new PaymentSystemContext(options);
 
         await _paymentSystemContext.Roles.AddRangeAsync(new []
         {
-            new RoleRecord() { Id = 1, Name = "User" },
-            new RoleRecord() { Id = 2, Name = "Admin" },
-            new RoleRecord() { Id = 3, Name = "KYC-Manager" },
-            new RoleRecord() { Id = 4, Name = "Funds-Manager" }
+            new RoleRecord() { Id = 1, Name = Roles.UserRole },
+            new RoleRecord() { Id = 2, Name = Roles.AdminRole },
+            new RoleRecord() { Id = 3, Name = Roles.KycManagerRole },
+            new RoleRecord() { Id = 4, Name = Roles.FundsManagerRole }
         });
         
         _rolesRepository = new RolesRepository(_paymentSystemContext);
@@ -58,25 +59,26 @@ public class AuthTests
     }
 
     [Test]
-    public async Task CreateUser_GetUserById()
+    public async Task CreateUser_GetUserById_Test()
     {
-        var userId = await _accountService.CreateUserAsync(registerModel);
+        var userId = await _accountService.CreateUserAsync(_registerModel);
         var user = await _accountService.GetUserByIdAsync(userId);
 
-        user!.Email.Should().Be(registerModel.Email);
-        user.Password.Should().Be(registerModel.Password);
+        user!.Email.Should().Be(_registerModel.Email);
+        user.Password.Should().Be(_registerModel.Password);
         user.Id.Should().Be(userId);
     }
     
     [Test]
-    public async Task CreateUser_GetUserRole_GetUserByEmail()
+    public async Task GetUserRole_GetUserByEmail_Test()
     {
-        var user = await _accountService.GetUserByEmailAsync(registerModel.Email);
+        var userId = await _accountService.CreateUserAsync(_registerModel);
+        var user = await _accountService.GetUserByEmailAsync(_registerModel.Email);
 
-        var role = await _rolesRepository.GetUserRoleAsync(user!.Id);
-        role.Should().Be("User");
+        var role = await _rolesRepository.GetUserRoleAsync(userId);
+        role.Should().Be(Roles.UserRole);
         
-        user.Email.Should().Be(registerModel.Email);
-        user.Password.Should().Be(registerModel.Password);
+        user!.Email.Should().Be(_registerModel.Email);
+        user.Password.Should().Be(_registerModel.Password);
     }
 }
