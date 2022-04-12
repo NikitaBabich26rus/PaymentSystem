@@ -25,39 +25,39 @@ public class KycController: Controller
     public async Task<IActionResult> Verification()
     {
         var userId = GetUserId();
-        var userVerification = await _accountService.GetUserVerificationAsync(userId);
+        var userVerification = await _verificationRepository.GetVerificationRequestByUserIdAsync(userId);
 
         return View("Verification", userVerification);
     }
 
     [HttpPost]
     [Authorize(Policy = Roles.UserRole)]
-    public async Task<IActionResult> VerifyUser(string passportData)
+    public async Task<IActionResult> SendVerificationRequest(string passportData)
     {
         var userId = GetUserId();
         if (!Int64.TryParse(passportData, out _))
         {
-            var userVerification = await _accountService.GetUserVerificationAsync(userId);
+            var userVerification = await _verificationRepository.GetVerificationRequestByUserIdAsync(userId);
             ViewBag.Error = "Incorrect passport data.";
             return View("Verification", userVerification);
         }
         
-        await _accountService.VerifyUserAsync(userId, passportData);
+        await _verificationRepository.SendVerificationRequestAsync(userId, passportData);
         return Redirect("/");
     }
     
     
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
-    public async Task<IActionResult> VerifyUsers()
+    public async Task<IActionResult> GetVerificationRequests()
     {
-        var verifications = await _verificationRepository.GetVerifyUsersAsync();
-        return View("VerifyUsers", verifications);
+        var verifications = await _verificationRepository.GetVerificationRequestsAsync();
+        return View("GetVerificationRequests", verifications);
     }
 
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
-    public async Task<IActionResult> AcceptUserVerification(int verificationId)
+    public async Task<IActionResult> AcceptUserVerificationRequest(int verificationId)
     {
         var kycManagerId = GetUserId();
         await _verificationRepository.AcceptUserVerificationAsync(verificationId, kycManagerId);
@@ -66,18 +66,21 @@ public class KycController: Controller
     
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
-    public async Task<IActionResult> RejectUserVerification(int verificationId)
+    public async Task<IActionResult> RejectUserVerificationRequest(int verificationId)
     {   
-        await _verificationRepository.RejectUserVerificationAsync(verificationId);
+        await _verificationRepository.RejectUserVerificationRequestAsync(verificationId);
         return Redirect("/Kyc/VerifyUsers");
     }
 
     [HttpGet]
     [Authorize(Roles = $"{Roles.AdminRole}, {Roles.KycManagerRole}")]
-    public async Task<IActionResult> VerifiedUsers()
+    public async Task<IActionResult> GetAcceptedRequestsForVerification()
     {
-        var verifications = await _verificationRepository.GetVerifiedUsers().ToListAsync();
-        return View("VerifiedUsers", verifications);
+        var verifications = await _verificationRepository
+            .GetAcceptedRequestsForVerificationAsync()
+            .ToListAsync();
+        
+        return View("GetAcceptedRequestsForVerification", verifications);
     }
     
     private int GetUserId()

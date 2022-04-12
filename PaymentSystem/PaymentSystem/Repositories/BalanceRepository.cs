@@ -11,10 +11,20 @@ public class BalanceRepository: IBalanceRepository
     {
         _paymentSystemContext = paymentSystemContext;
     }
-    
-    public async ValueTask<BalanceRecord?> GetUserBalanceAsync(int userId)
-        => await _paymentSystemContext.Balances
+
+    public async ValueTask<BalanceRecord> GetUserBalanceAsync(int userId)
+    {
+        var userBalance  = await _paymentSystemContext.Balances
             .SingleOrDefaultAsync(x => x.UserId == userId);
+
+        if (userBalance == null)
+        {
+            throw new ArgumentException($"Not listed balance for userId: {userId}");
+        }
+
+        return userBalance;
+    }
+    
 
     public async Task CreateBalanceForUserAsync(int userId)
     {

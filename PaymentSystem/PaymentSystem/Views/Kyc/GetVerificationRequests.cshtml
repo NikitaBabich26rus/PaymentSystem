@@ -27,7 +27,7 @@
                     <button
                         type="button"
                         class="btn btn-success"
-                        onclick="location.href='@Url.Action("AcceptUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        onclick="location.href='@Url.Action("AcceptUserVerificationRequest", "Kyc", new {verificationId = verification.Id})'">
                         Accept
                     </button>
                 </td>
@@ -35,7 +35,7 @@
                     <button
                         type="button"
                         class="btn btn-danger"
-                        onclick="location.href='@Url.Action("RejectUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        onclick="location.href='@Url.Action("RejectUserVerificationRequest", "Kyc", new {verificationId = verification.Id})'">
                         Reject
                     </button>
                 </td>

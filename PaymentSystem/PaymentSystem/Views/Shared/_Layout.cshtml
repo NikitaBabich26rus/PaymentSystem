@@ -24,10 +24,10 @@
             <div class="d-flex flex-row">
                 @if ((await _authorizationService.AuthorizeAsync(User, Roles.AdminRole)).Succeeded)
                 {
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="AcceptedFundTransfers">
                         Verified fund transfers
                     </a>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="GetAcceptedRequestsForVerification">
                         Verified users
                     </a>
                     <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Users">
@@ -36,19 +36,19 @@
                 }
                 @if ((await _authorizationService.AuthorizeAsync(User, Roles.KycManagerRole)).Succeeded)
                 {
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifiedUsers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="GetAcceptedRequestsForVerification">
                         Verified users
                     </a>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="VerifyUsers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Kyc" asp-action="GetVerificationRequests">
                         Verify users
                     </a>
                 }
                 @if ((await _authorizationService.AuthorizeAsync(User, Roles.FundsManagerRole)).Succeeded)
                 {
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="VerifiedFundTransfers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="AcceptedFundTransfers">
                         Verified fund transfers
                     </a>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="UnverifiedFundTransfers">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Funds" asp-action="UncheckedFundTransfers">
                         Unverified fund transfers
                     </a>
                 }

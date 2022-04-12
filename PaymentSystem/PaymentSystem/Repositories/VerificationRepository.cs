@@ -16,7 +16,7 @@ public class VerificationRepository: IVerificationRepository
         _accountRepository = accountRepository;
     }
 
-    public async Task VerifyUserAsync(int userId, string passportData)
+    public async Task SendVerificationRequestAsync(int userId, string passportData)
     {
         var verification = new VerificationRecord()
         {
@@ -29,12 +29,12 @@ public class VerificationRepository: IVerificationRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async ValueTask<VerificationRecord?> GetVerificationByUserIdAsync(int userId)
+    public async ValueTask<VerificationRecord?> GetVerificationRequestByUserIdAsync(int userId)
         => await _paymentSystemContext.VerificationTransfers
             .Include(v => v.User)
             .FirstOrDefaultAsync(v => v.UserId == userId);
     
-    public async ValueTask<List<VerificationRecord>> GetVerifyUsersAsync()
+    public async ValueTask<List<VerificationRecord>> GetVerificationRequestsAsync()
         => await _paymentSystemContext.VerificationTransfers
             .Where(v => v.ConfirmedBy == null)
             .Include(v => v.User)
@@ -65,7 +65,7 @@ public class VerificationRepository: IVerificationRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async Task RejectUserVerificationAsync(int verificationId)
+    public async Task RejectUserVerificationRequestAsync(int verificationId)
     {
         var verification = await GetVerificationByIdAsync(verificationId);
         
@@ -78,7 +78,7 @@ public class VerificationRepository: IVerificationRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public IQueryable<VerificationRecord> GetVerifiedUsers()
+    public IQueryable<VerificationRecord> GetAcceptedRequestsForVerificationAsync()
         => _paymentSystemContext.VerificationTransfers
             .Where(v => v.ConfirmedBy != null)
             .Include(v => v.User)

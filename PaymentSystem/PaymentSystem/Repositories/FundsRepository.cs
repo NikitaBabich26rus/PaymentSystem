@@ -37,6 +37,13 @@ public class FundsRepository: IFundsRepository
 
     public async Task CreateWithdrawalAsync(CardModel card, int createdByUserId, int createdToUserId)
     {
+        var userBalance = await _balanceRepository.GetUserBalanceAsync(createdToUserId);
+
+        if (userBalance.Amount < card.AmountOfMoney)
+        {
+            throw new ArgumentException("Not enough money to withdraw.");
+        }
+        
         var fundTransfer = new FundTransferRecord()
         {
             UserId = createdToUserId,
@@ -62,7 +69,7 @@ public class FundsRepository: IFundsRepository
             .OrderBy(f => f.CreatedAt)
             .ToListAsync();
 
-    public async ValueTask<List<FundTransferRecord>> GetUnverifiedFundTransfers()
+    public async ValueTask<List<FundTransferRecord>> GetUncheckedFundTransfers()
         => await _paymentSystemContext.FundTransfers
             .Where(f => f.ConfirmedBy == null)
             .Include(f => f.UserRecord)
@@ -70,7 +77,7 @@ public class FundsRepository: IFundsRepository
             .OrderBy(f => f.CreatedAt)
             .ToListAsync();
 
-    public async ValueTask<List<FundTransferRecord>> GetVerifiedFundTransfers()
+    public async ValueTask<List<FundTransferRecord>> GetAcceptedFundTransfers()
         => await _paymentSystemContext.FundTransfers
             .Where(f => f.ConfirmedBy != null)
             .Include(f => f.UserRecord)
@@ -127,6 +134,7 @@ public class FundsRepository: IFundsRepository
         {
             return;
         }
+        
         _paymentSystemContext.FundTransfers.Remove(fundTransfer);
         await _paymentSystemContext.SaveChangesAsync();
     }

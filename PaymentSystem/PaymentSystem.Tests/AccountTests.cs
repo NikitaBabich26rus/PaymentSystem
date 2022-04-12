@@ -14,7 +14,6 @@ public class AccountTests
 {
     private PaymentSystemContext _paymentSystemContext = null!;
     private AccountService _accountService = null!;
-    private RolesRepository _rolesRepository = null!;
 
     private readonly RegisterModel _registerUser = new()
     {
@@ -42,18 +41,16 @@ public class AccountTests
             new RoleRecord() { Id = 3, Name = Roles.KycManagerRole },
             new RoleRecord() { Id = 4, Name = Roles.FundsManagerRole }
         });
+        await _paymentSystemContext.SaveChangesAsync();
 
-
-        _rolesRepository = new RolesRepository(_paymentSystemContext);
+        var rolesRepository = new RolesRepository(_paymentSystemContext);
         var accountRepository = new AccountRepository(_paymentSystemContext);
         var balanceRepository = new BalanceRepository(_paymentSystemContext);
-        var verificationRepository = new VerificationRepository(_paymentSystemContext, accountRepository);
 
         _accountService = new AccountService(
             accountRepository,
-            _rolesRepository,
-            balanceRepository,
-            verificationRepository);
+            rolesRepository,
+            balanceRepository);
 
         var userId = await _accountService.CreateUserAsync(_registerUser);
         _userId = userId;

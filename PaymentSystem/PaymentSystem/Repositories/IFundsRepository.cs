@@ -11,9 +11,9 @@ public interface IFundsRepository
 
     Task CreateWithdrawalAsync(CardModel card, int createdByUserId, int createdToUserId);
 
-    ValueTask<List<FundTransferRecord>> GetUnverifiedFundTransfers();
+    ValueTask<List<FundTransferRecord>> GetUncheckedFundTransfers();
 
-    ValueTask<List<FundTransferRecord>> GetVerifiedFundTransfers();
+    ValueTask<List<FundTransferRecord>> GetAcceptedFundTransfers();
 
     Task AcceptFundTransfer(int fundTransferId, int fundManagerId);
 

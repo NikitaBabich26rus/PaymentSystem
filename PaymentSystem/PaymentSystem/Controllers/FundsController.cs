@@ -80,18 +80,18 @@ public class FundsController: Controller
 
     [HttpGet]
     [Authorize(Policy = Roles.FundsManagerRole)]
-    public async Task<IActionResult> UnverifiedFundTransfers()
+    public async Task<IActionResult> UncheckedFundTransfers()
     {
-        var fundTransfers = await _fundsRepository.GetUnverifiedFundTransfers();
-        return View("UnverifiedFundTransfers", fundTransfers);
+        var fundTransfers = await _fundsRepository.GetUncheckedFundTransfers();
+        return View("UncheckedFundTransfers", fundTransfers);
     }
     
     [HttpGet]
     [Authorize(Roles = $"{Roles.FundsManagerRole}, {Roles.AdminRole}")]
-    public async Task<IActionResult> VerifiedFundTransfers()
+    public async Task<IActionResult> AcceptedFundTransfers()
     {
-        var fundTransfers = await _fundsRepository.GetVerifiedFundTransfers();
-        return View("VerifiedFundTransfers", fundTransfers);
+        var fundTransfers = await _fundsRepository.GetAcceptedFundTransfers();
+        return View("AcceptedFundTransfers", fundTransfers);
     }
     
     [HttpGet]
