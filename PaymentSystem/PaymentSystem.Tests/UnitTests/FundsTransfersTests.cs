@@ -8,7 +8,7 @@ using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
-namespace PaymentSystem.Tests;
+namespace PaymentSystem.Tests.UnitTests;
 
 public class FundsTransfersTests
 {
@@ -88,7 +88,7 @@ public class FundsTransfersTests
     public async Task CreateDeposit_AcceptFundTransfer_GetUserBalance_Test()
     {
         await _fundsRepository.CreateDepositAsync(_card, _userId, _userId);
-        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(_userId);
+        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(_userId).ToListAsync();
 
         fundTransfers[0].CardCvc.Should().Be(_card.CardCvc);
         fundTransfers[0].CardNumber.Should().Be(_card.CardNumber);
@@ -97,7 +97,7 @@ public class FundsTransfersTests
         fundTransfers[0].UserId.Should().Be(_userId);
         
         await _fundsRepository.AcceptFundTransfer(fundTransfers[0].Id, _fundsManagerId);
-        var acceptedFundTransfers = await _fundsRepository.GetAcceptedFundTransfers();
+        var acceptedFundTransfers = await _fundsRepository.GetAcceptedFundTransfers().ToListAsync();
         
         acceptedFundTransfers[0].CardCvc.Should().Be(_card.CardCvc);
         acceptedFundTransfers[0].CardNumber.Should().Be(_card.CardNumber);
@@ -113,7 +113,7 @@ public class FundsTransfersTests
     public async Task CreateDeposit_RejectFundTransfer_GetUserBalance_Test()
     {
         await _fundsRepository.CreateDepositAsync(_card, _userId, _userId);
-        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(_userId);
+        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(_userId).ToListAsync();
 
         fundTransfers[0].CardCvc.Should().Be(_card.CardCvc);
         fundTransfers[0].CardNumber.Should().Be(_card.CardNumber);
@@ -143,14 +143,14 @@ public class FundsTransfersTests
     public async Task CreateDeposit_CreateWithdrawal_AcceptFundsTransfers_GetUserBalance_Test()
     {
         await _fundsRepository.CreateDepositAsync(_card, _userId, _userId);
-        var fundTransfers = await _fundsRepository.GetUncheckedFundTransfers();
+        var fundTransfers = await _fundsRepository.GetUncheckedFundTransfers().ToListAsync();
         await _fundsRepository.AcceptFundTransfer(fundTransfers[0].Id, _fundsManagerId);
 
         var userBalance = await _balanceRepository.GetUserBalanceAsync(_userId);
         userBalance.Amount.Should().Be(100m);
         
         await _fundsRepository.CreateWithdrawalAsync(_card, _userId, _userId);
-        fundTransfers = await _fundsRepository.GetUncheckedFundTransfers();
+        fundTransfers = await _fundsRepository.GetUncheckedFundTransfers().ToListAsync();
         await _fundsRepository.AcceptFundTransfer(fundTransfers[0].Id, _fundsManagerId);
 
         userBalance = await _balanceRepository.GetUserBalanceAsync(_userId);
@@ -161,16 +161,31 @@ public class FundsTransfersTests
     public async Task CreateDeposit_GetUncheckedFundsTransfers_AcceptFundsTransfer_GetAcceptedFundsTransfers_Test()
     {
         await _fundsRepository.CreateDepositAsync(_card, _userId, _userId);
-        var uncheckedFundTransfers = await _fundsRepository.GetUncheckedFundTransfers();
+        var uncheckedFundTransfers = await _fundsRepository.GetUncheckedFundTransfers().ToListAsync();
 
         uncheckedFundTransfers.Count.Should().Be(1);
         
         await _fundsRepository.AcceptFundTransfer(uncheckedFundTransfers[0].Id, _fundsManagerId);
 
-        var acceptedFundsTransfers = await _fundsRepository.GetAcceptedFundTransfers();
-        uncheckedFundTransfers = await _fundsRepository.GetUncheckedFundTransfers();
+        var acceptedFundsTransfers = await _fundsRepository.GetAcceptedFundTransfers().ToListAsync();
+        uncheckedFundTransfers = await _fundsRepository.GetUncheckedFundTransfers().ToListAsync();
         
         acceptedFundsTransfers.Count.Should().Be(1);
         uncheckedFundTransfers.Count.Should().Be(0);
     }
+    
+    [Test]
+    public async Task CreateWithdrawal_AcceptFundTransferTwice_GetUserBalance_Test()
+    {
+        await _fundsRepository.CreateDepositAsync(_card, _userId, _userId);
+        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(_userId).ToListAsync();
+
+        var firstAcceptFundTransfer = _fundsRepository.AcceptFundTransfer(fundTransfers[0].Id, _fundsManagerId);
+        var secondAcceptFundTransfer = _fundsRepository.AcceptFundTransfer(fundTransfers[0].Id, _fundsManagerId);
+        await Task.WhenAll(firstAcceptFundTransfer, secondAcceptFundTransfer);
+
+        var userBalance = await _balanceRepository.GetUserBalanceAsync(_userId);
+        userBalance.Amount.Should().Be(_card.AmountOfMoney);
+    }
+    
 }

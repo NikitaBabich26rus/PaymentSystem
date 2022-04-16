@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
@@ -25,8 +26,20 @@ public class AccountController: Controller
     public async Task<IActionResult> Profile()
     {
         var id = GetUserId();
-        var userProfile = await _accountService.GetUserProfileAsync(id);
-        return View("Account", userProfile);
+        try
+        {
+            var userProfile = await _accountService.GetUserProfileAsync(id);
+            return View("Profile", userProfile);
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpPost]
@@ -35,6 +48,7 @@ public class AccountController: Controller
     {
         var userId = GetUserId();
         var userProfile = await _accountService.GetUserProfileAsync(userId);
+
         if (!ModelState.IsValid)
         {
             var messages = string.Join(" ", ModelState.Values
@@ -42,41 +56,84 @@ public class AccountController: Controller
                 .Select(x => x.ErrorMessage));
             
             ViewBag.Error = messages;
-            return View("Account", userProfile);
+            return View("Profile", userProfile);
         }
         
         var user = await _accountService.GetUserByIdAsync(userId);
-        if (String.CompareOrdinal(user!.Password, updateUserAccountModel.OldPassword) != 0)
+
+        if (user == null)
         {
-            ViewBag.Error = "Password error";
-            return View("Account", userProfile);
+            ViewBag.Error = "User not found for update.";
+            return View("Profile", userProfile);
         }
         
-        await _accountService.UpdateUserAccountAsync(updateUserAccountModel, user);
-        return Redirect("/");
+        if (String.CompareOrdinal(user.Password, updateUserAccountModel.OldPassword) != 0)
+        {
+            ViewBag.Error = "Password error";
+            return View("Profile", userProfile);
+        }
+
+        try
+        {
+            await _accountService.UpdateUserAccountAsync(updateUserAccountModel, user);
+            return Redirect("/");
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpGet]
     [Authorize(Policy = Roles.AdminRole)]
     public async Task<IActionResult> Users()
     {
-        var usersProfiles = await _accountService.GetUsersProfiles();
-        return View("Users", usersProfiles);
+        try
+        {
+            var usersProfiles = await _accountService.GetUsersProfiles();
+            return View("Users", usersProfiles);
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpGet]
     [Authorize(Policy = Roles.AdminRole)]
     public async Task<IActionResult> UserProfile(string userId)
     {
-        Int32.TryParse(userId, out var id);
-        var editUserProfile = await GetEditUserProfileModel(id);
-        
-        if (GetUserId() == id)
+        try
         {
-            return View("Account", editUserProfile.UserProfile);
+            Int32.TryParse(userId, out var id);
+            var editUserProfile = await GetEditUserProfileModel(id);
+
+            if (GetUserId() == id)
+            {
+                return View("Profile", editUserProfile.UserProfile);
+            }
+
+            return View("UserProfile", editUserProfile);
         }
-        
-        return View("UserProfile", editUserProfile);
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpPost]
@@ -91,18 +148,43 @@ public class AccountController: Controller
                 .Select(x => x.ErrorMessage));
             
             ViewBag.Error = messages;
-            var editUserProfile = await GetEditUserProfileModel(userId);
-            return View("UserProfile", editUserProfile);
+
+            try
+            {
+                var editUserProfile = await GetEditUserProfileModel(userId);
+                return View("UserProfile", editUserProfile);
+            }
+            catch (Exception e)
+            {
+                var error = new ErrorModel()
+                {
+                    ErrorMessage = e.Message,
+                };
+
+                return View("Error", error);
+            }
         }
 
-        await _accountService.UpdateUserProfileByAdminAsync(userId, userProfile);
-        return Redirect("/");
+        try
+        {
+            await _accountService.UpdateUserProfileByAdminAsync(userId, userProfile);
+            return Redirect("/");   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     private async ValueTask<EditUserProfileModel> GetEditUserProfileModel(int userId)
     {
         var userProfile = await _accountService.GetUserProfileAsync(userId);
-        var roles = await _rolesRepository.GetRolesAsync();
+        var roles = await _rolesRepository.GetRolesAsync().ToListAsync();
         var editUserProfile = new EditUserProfileModel()
         {
             UserProfile = userProfile,

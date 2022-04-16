@@ -70,7 +70,7 @@ public class AuthController: Controller
         }
         catch (Exception)
         {
-            ViewBag.Error = "Login error, contact support please.";
+            ViewBag.Error = "Sign in error, contact support please.";
             return View("Login");
         }
     }

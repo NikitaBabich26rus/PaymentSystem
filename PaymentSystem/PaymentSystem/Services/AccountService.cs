@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Data;
 using PaymentSystem.Models;
 using PaymentSystem.Repositories;
@@ -26,18 +27,24 @@ public class AccountService
     public async ValueTask<UserProfileModel> GetUserProfileAsync(int userId)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
-        var userRole = await _rolesRepository.GetUserRoleAsync(userId);
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User was not found");
+        }
         
+        var userRole = await _rolesRepository.GetUserRoleAsync(userId);
+
         var balance = await _balanceRepository.GetUserBalanceAsync(userId);
 
         if (balance == null)
         {
-            throw new ArgumentException($"No balance was found for the user with id: {userId}.");
+            throw new ArgumentException($"No balance was found for the user.");
         }
 
         var userProfile = new UserProfileModel()
         {
-            Id = user!.Id,
+            Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
@@ -85,41 +92,20 @@ public class AccountService
     public async Task UpdateUserProfileByAdminAsync(int userId, UpdateUserProfileModel updateUser)
     {
         var user = await _accountRepository.GetUserByIdAsync(userId);
-        user!.Email = updateUser.Email;
+
+        if (user == null)
+        {
+            throw new Exception("User not found for update.");
+        }
+        
+        user.Email = updateUser.Email;
         user.FirstName = updateUser.FirstName;
         user.LastName = updateUser.LastName;
         user.IsBlocked = updateUser.Status != UserStatus.ActiveStatus;
-        await _rolesRepository.UpdateUserRoleAsync(updateUser.Role, userId);
+        await _rolesRepository.UpdateUserRoleAsync(userId, updateUser.Role);
         await _accountRepository.UpdateUserAsync(user);
     }
 
-    public async Task<List<UserProfileModel>> GetUsersProfiles()
-    {
-        var users = await _accountRepository.GetUsersAsync();
-        var usersProfiles = new List<UserProfileModel>();
-
-        foreach (var user in users)
-        {
-            if (user.RoleRecord.Name == Roles.AdminRole)
-            {
-                continue;   
-            }
-
-            var userBalance = await _balanceRepository.GetUserBalanceAsync(user.UserRecord.Id);
-
-            usersProfiles.Add(new UserProfileModel()
-            {
-                Id = user.UserRecord.Id,
-                FirstName = user.UserRecord.FirstName,
-                LastName = user.UserRecord.LastName,
-                Email = user.UserRecord.Email,
-                RegisteredAt = user.UserRecord.RegisteredAt,
-                IsVerified = user.UserRecord.IsVerified,
-                IsBlocked = user.UserRecord.IsBlocked,
-                Balance = userBalance.Amount,
-                Role = user.RoleRecord.Name
-            });
-        }
-        return usersProfiles;
-    }
+    public async ValueTask<List<UserProfileModel>> GetUsersProfiles()
+        => await _accountRepository.GetUsersProfilesAsync().ToListAsync();
 }

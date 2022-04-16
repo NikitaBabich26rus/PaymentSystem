@@ -8,7 +8,7 @@ using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
-namespace PaymentSystem.Tests;
+namespace PaymentSystem.Tests.UnitTests;
 
 public class VerificationTests
 {
@@ -139,7 +139,8 @@ public class VerificationTests
         await _verificationRepository.SendVerificationRequestAsync(_userId, passportData);
         
         var verificationRequests = await _verificationRepository
-            .GetVerificationRequestsAsync();
+            .GetVerificationRequestsAsync()
+            .ToListAsync();
 
         var user = await _accountService.GetUserByIdAsync(_userId);
 

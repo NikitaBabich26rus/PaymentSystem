@@ -8,7 +8,7 @@ public interface IVerificationRepository
 
     ValueTask<VerificationRecord?> GetVerificationRequestByUserIdAsync(int userId);
 
-    ValueTask<List<VerificationRecord>> GetVerificationRequestsAsync();
+    IQueryable<VerificationRecord> GetVerificationRequestsAsync();
 
     IQueryable<VerificationRecord> GetAcceptedRequestsForVerificationAsync();
 

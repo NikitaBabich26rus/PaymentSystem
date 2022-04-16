@@ -8,7 +8,7 @@ using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
-namespace PaymentSystem.Tests;
+namespace PaymentSystem.Tests.UnitTests;
 
 public class AccountTests
 {
@@ -80,6 +80,7 @@ public class AccountTests
     public async Task UpdateUserAccount_Test()
     {
         var user = await _accountService.GetUserByIdAsync(_userId);
+
         var updatedUserAccount = new UpdateUserAccountModel()
         {
             FirstName = "Ivan1",

@@ -34,11 +34,10 @@ public class VerificationRepository: IVerificationRepository
             .Include(v => v.User)
             .FirstOrDefaultAsync(v => v.UserId == userId);
     
-    public async ValueTask<List<VerificationRecord>> GetVerificationRequestsAsync()
-        => await _paymentSystemContext.VerificationTransfers
+    public IQueryable<VerificationRecord> GetVerificationRequestsAsync()
+        => _paymentSystemContext.VerificationTransfers
             .Where(v => v.ConfirmedBy == null)
-            .Include(v => v.User)
-            .ToListAsync();
+            .Include(v => v.User);
 
     public async Task AcceptUserVerificationAsync(int verificationId, int kycManagerId)
     {

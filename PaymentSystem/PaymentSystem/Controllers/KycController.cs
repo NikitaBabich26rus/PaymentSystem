@@ -2,48 +2,68 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PaymentSystem.Models;
 using PaymentSystem.Repositories;
-using PaymentSystem.Services;
 
 namespace PaymentSystem.Controllers;
 
 public class KycController: Controller
 {
     private readonly IVerificationRepository _verificationRepository;
-    private readonly AccountService _accountService;
-    
-    public KycController(
-        IVerificationRepository verificationRepository,
-        AccountService accountService)
+
+    public KycController(IVerificationRepository verificationRepository)
     {
-        _accountService = accountService;
         _verificationRepository = verificationRepository;
     }
 
     [HttpGet]
-    [Authorize(Policy = Roles.UserRole)]
-    public async Task<IActionResult> Verification()
+    [Authorize]
+    public async Task<IActionResult> VerificationRequest()
     {
-        var userId = GetUserId();
-        var userVerification = await _verificationRepository.GetVerificationRequestByUserIdAsync(userId);
+        try
+        {
+            var userId = GetUserId();
+            var userVerification = await _verificationRepository.GetVerificationRequestByUserIdAsync(userId);
 
-        return View("Verification", userVerification);
+            return View("VerificationRequest", userVerification);
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpPost]
-    [Authorize(Policy = Roles.UserRole)]
+    [Authorize]
     public async Task<IActionResult> SendVerificationRequest(string passportData)
     {
         var userId = GetUserId();
+        
         if (!Int64.TryParse(passportData, out _))
         {
-            var userVerification = await _verificationRepository.GetVerificationRequestByUserIdAsync(userId);
             ViewBag.Error = "Incorrect passport data.";
-            return View("Verification", userVerification);
+            return View("VerificationRequest", null);
         }
-        
-        await _verificationRepository.SendVerificationRequestAsync(userId, passportData);
-        return Redirect("/");
+
+        try
+        {
+            await _verificationRepository.SendVerificationRequestAsync(userId, passportData);
+            return Redirect("/");   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     
@@ -51,36 +71,84 @@ public class KycController: Controller
     [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> GetVerificationRequests()
     {
-        var verifications = await _verificationRepository.GetVerificationRequestsAsync();
-        return View("GetVerificationRequests", verifications);
+        try
+        {
+            var verifications = await _verificationRepository.GetVerificationRequestsAsync().ToListAsync();
+            return View("GetVerificationRequests", verifications);    
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> AcceptUserVerificationRequest(int verificationId)
     {
-        var kycManagerId = GetUserId();
-        await _verificationRepository.AcceptUserVerificationAsync(verificationId, kycManagerId);
-        return Redirect("/Kyc/VerifyUsers");
+        try
+        {
+            var kycManagerId = GetUserId();
+            await _verificationRepository.AcceptUserVerificationAsync(verificationId, kycManagerId);
+            return Redirect("/Kyc/GetVerificationRequests");
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpGet]
     [Authorize(Policy = Roles.KycManagerRole)]
     public async Task<IActionResult> RejectUserVerificationRequest(int verificationId)
-    {   
-        await _verificationRepository.RejectUserVerificationRequestAsync(verificationId);
-        return Redirect("/Kyc/VerifyUsers");
+    {
+        try
+        {
+            await _verificationRepository.RejectUserVerificationRequestAsync(verificationId);
+            return Redirect("/Kyc/GetVerificationRequests");
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpGet]
     [Authorize(Roles = $"{Roles.AdminRole}, {Roles.KycManagerRole}")]
     public async Task<IActionResult> GetAcceptedRequestsForVerification()
     {
-        var verifications = await _verificationRepository
-            .GetAcceptedRequestsForVerificationAsync()
-            .ToListAsync();
-        
-        return View("GetAcceptedRequestsForVerification", verifications);
+        try
+        {
+            var verifications = await _verificationRepository
+                .GetAcceptedRequestsForVerificationAsync()
+                .ToListAsync();
+
+            return View("GetAcceptedRequestsForVerification", verifications);
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     private int GetUserId()

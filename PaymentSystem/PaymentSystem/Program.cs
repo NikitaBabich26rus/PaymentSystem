@@ -10,7 +10,8 @@ builder.Services.AddDbContext<PaymentSystemContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
     
-}, ServiceLifetime.Transient);
+}, ServiceLifetime.Singleton);
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication("Cookie")
     .AddCookie("Cookie", options =>
@@ -46,8 +47,8 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepository>();
-builder.Services.AddScoped<IBalanceRepository, BalanceRepository>();
-builder.Services.AddScoped<IFundsRepository, FundsRepository>();
+builder.Services.AddSingleton<IBalanceRepository, BalanceRepository>();
+builder.Services.AddSingleton<IFundsRepository, FundsRepository>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -67,4 +68,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
 app.Run();
+
 public partial class Program { }

@@ -2,13 +2,13 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using PaymentSystem.Data;
 using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 using PaymentSystem.Services;
 
-namespace PaymentSystem.Tests;
-using NUnit.Framework;
+namespace PaymentSystem.Tests.UnitTests;
 
 [TestFixture]
 public class AuthTests

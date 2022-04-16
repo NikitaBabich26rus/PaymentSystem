@@ -8,7 +8,8 @@ public class FundsRepository: IFundsRepository
 {
     private readonly PaymentSystemContext _paymentSystemContext;
     private readonly IBalanceRepository _balanceRepository;
-    
+    private readonly Semaphore _fundsSemaphore = new(1, 1);
+
     public FundsRepository(
         PaymentSystemContext paymentSystemContext,
         IBalanceRepository balanceRepository)
@@ -60,43 +61,43 @@ public class FundsRepository: IFundsRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
     
-    public async ValueTask<List<FundTransferRecord>> GetFundTransfersOfUser(int userId) 
-        => await _paymentSystemContext.FundTransfers
+    public IQueryable<FundTransferRecord> GetFundTransfersOfUser(int userId) 
+        => _paymentSystemContext.FundTransfers
             .Where(f => f.UserId == userId)
             .Include(f => f.ConfirmedByUserRecord)
             .Include(f => f.UserRecord)
             .Include(f => f.CreatedByUserRecord)
-            .OrderBy(f => f.CreatedAt)
-            .ToListAsync();
+            .OrderBy(f => f.CreatedAt);
 
-    public async ValueTask<List<FundTransferRecord>> GetUncheckedFundTransfers()
-        => await _paymentSystemContext.FundTransfers
+    public IQueryable<FundTransferRecord> GetUncheckedFundTransfers()
+        => _paymentSystemContext.FundTransfers
             .Where(f => f.ConfirmedBy == null)
             .Include(f => f.UserRecord)
             .Include(f => f.CreatedByUserRecord)
-            .OrderBy(f => f.CreatedAt)
-            .ToListAsync();
+            .OrderBy(f => f.CreatedAt);
 
-    public async ValueTask<List<FundTransferRecord>> GetAcceptedFundTransfers()
-        => await _paymentSystemContext.FundTransfers
+    public IQueryable<FundTransferRecord> GetAcceptedFundTransfers()
+        => _paymentSystemContext.FundTransfers
             .Where(f => f.ConfirmedBy != null)
             .Include(f => f.UserRecord)
             .Include(f => f.CreatedByUserRecord)
             .Include(f => f.ConfirmedByUserRecord)
-            .OrderBy(f => f.CreatedAt)
-            .ToListAsync();
+            .OrderBy(f => f.CreatedAt);
     
     public async Task AcceptFundTransfer(int fundTransferId, int fundManagerId)
     {
-        var fundTransfer = await GetFundTransferAsync(fundTransferId);
+        _fundsSemaphore.WaitOne();
         
-        if (fundTransfer == null)
+        var fundTransfer = await GetFundTransferAsync(fundTransferId);
+
+        if (fundTransfer == null ||
+            fundTransfer.ConfirmedBy != null)
         {
             return;
         }
-        
+
         var userBalance = await _balanceRepository.GetUserBalanceAsync(fundTransfer.UserId);
-        
+
         if (fundTransfer.TransferType == TransferType.Withdrawal
             && userBalance.Amount < fundTransfer.AmountOfMoney)
         {
@@ -106,11 +107,10 @@ public class FundsRepository: IFundsRepository
         
         fundTransfer.ConfirmedAt = DateTime.UtcNow;
         fundTransfer.ConfirmedBy = fundManagerId;
-
+        
         if (fundTransfer.TransferType == TransferType.Withdrawal)
         {
             userBalance.Amount -= fundTransfer.AmountOfMoney;
-            
         }
         else
         {
@@ -120,6 +120,8 @@ public class FundsRepository: IFundsRepository
         _paymentSystemContext.Entry(fundTransfer).State = EntityState.Modified;
         _paymentSystemContext.Entry(userBalance).State = EntityState.Modified;
         await _paymentSystemContext.SaveChangesAsync();
+
+        _fundsSemaphore.Release();
     }
 
     public async ValueTask<FundTransferRecord?> GetFundTransferAsync(int fundTransferId)
