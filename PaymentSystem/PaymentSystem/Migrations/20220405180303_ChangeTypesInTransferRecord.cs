@@ -13,37 +13,12 @@ namespace PaymentSystem.Migrations
                 name: "user_date",
                 table: "fund_transfers",
                 newName: "card_date");
-
-
+            
             migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_number TYPE bigint USING (card_number::bigint);");
 
             migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_cvc TYPE integer USING (card_number::integer);");
 
             migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_date TYPE integer USING (card_number::integer);");
-
-            migrationBuilder.AlterColumn<long>(
-                name: "card_number",
-                table: "fund_transfers",
-                type: "bigint",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "card_cvc",
-                table: "fund_transfers",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "card_date",
-                table: "fund_transfers",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
 
             migrationBuilder.UpdateData(
                 table: "users",
