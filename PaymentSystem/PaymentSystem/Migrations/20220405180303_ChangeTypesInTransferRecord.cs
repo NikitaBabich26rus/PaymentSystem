@@ -16,9 +16,9 @@ namespace PaymentSystem.Migrations
             
             migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_number TYPE bigint USING (card_number::bigint);");
 
-            migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_cvc TYPE integer USING (card_number::integer);");
+            migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_cvc TYPE integer USING (card_cvc::integer);");
 
-            migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_date TYPE integer USING (card_number::integer);");
+            migrationBuilder.Sql("alter table payment_system.public.fund_transfers alter column card_date TYPE integer USING (card_date::integer);");
 
             migrationBuilder.UpdateData(
                 table: "users",
