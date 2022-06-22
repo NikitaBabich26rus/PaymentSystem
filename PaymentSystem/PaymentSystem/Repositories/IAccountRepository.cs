@@ -16,5 +16,5 @@ public interface IAccountRepository
     
     Task UpdateUserAsync(UserRecord userRecord);
 
-    Task<IEnumerable<UserRoleRecord>> GetUsersAsync();
+    IQueryable<UserProfileModel> GetUsersProfilesAsync();
 }

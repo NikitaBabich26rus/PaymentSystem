@@ -7,13 +7,13 @@ public interface IFundsRepository
 {
     Task CreateDepositAsync(CardModel card, int createdByUserId, int createdToUserId);
 
-    ValueTask<List<FundTransferRecord>> GetFundTransfersOfUser(int userId);
+    IQueryable<FundTransferRecord> GetFundTransfersOfUser(int userId);
 
     Task CreateWithdrawalAsync(CardModel card, int createdByUserId, int createdToUserId);
 
-    ValueTask<List<FundTransferRecord>> GetUnverifiedFundTransfers();
+    IQueryable<FundTransferRecord> GetUncheckedFundTransfers();
 
-    ValueTask<List<FundTransferRecord>> GetVerifiedFundTransfers();
+    IQueryable<FundTransferRecord> GetAcceptedFundTransfers();
 
     Task AcceptFundTransfer(int fundTransferId, int fundManagerId);
 

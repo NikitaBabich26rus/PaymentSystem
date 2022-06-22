@@ -1,4 +1,4 @@
-@model PaymentSystem.Models.ErrorViewModel
+@model PaymentSystem.Models.ErrorModel
 @{
     ViewData["Title"] = "Error";
 }
@@ -10,6 +10,13 @@
 {
     <p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+@if (Model.ShowErrorMessage)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.ErrorMessage</code>
     </p>
 }
 

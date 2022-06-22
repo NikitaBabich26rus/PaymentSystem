@@ -1,8 +1,8 @@
-@model List<PaymentSystem.Data.VerificationTransferRecord>
+@model List<PaymentSystem.Data.VerificationRecord>
 
 <div>
-    <h4>
-        Verify users page
+    <h4 style="margin-top: 40px">
+        Unchecked verification requests
     </h4>
     <table class="table table-striped" style="margin-top: 30px">
         <tr>
@@ -27,7 +27,7 @@
                     <button
                         type="button"
                         class="btn btn-success"
-                        onclick="location.href='@Url.Action("AcceptUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        onclick="location.href='@Url.Action("AcceptUserVerificationRequest", "Kyc", new {verificationId = verification.Id})'">
                         Accept
                     </button>
                 </td>
@@ -35,7 +35,7 @@
                     <button
                         type="button"
                         class="btn btn-danger"
-                        onclick="location.href='@Url.Action("RejectUserVerification", "Kyc", new {verificationId = verification.Id})'">
+                        onclick="location.href='@Url.Action("RejectUserVerificationRequest", "Kyc", new {verificationId = verification.Id})'">
                         Reject
                     </button>
                 </td>

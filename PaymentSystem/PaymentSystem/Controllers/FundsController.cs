@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaymentSystem.Models;
 using PaymentSystem.Repositories;
 
@@ -16,122 +17,183 @@ public class FundsController: Controller
     }
 
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public IActionResult CreateDeposit()
     {
         return View("CreateDeposit");
     } 
     
     [HttpPost]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = Roles.UserRole)]
     public async Task<IActionResult> CreateDeposit(CardModel card)
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             return View("CreateDeposit");
         }
 
-        if (!IsCardValid(card))
+        try
         {
-            ViewBag.Error = "Validation error";
+            var userId = GetUserId();
+            await _fundsRepository.CreateDepositAsync(card, userId, userId);
+
+            return Redirect("/");
+        }
+        catch (Exception e)
+        {
+            ViewBag.Error = e.Message;
             return View("CreateDeposit");
         }
-
-        var userId = GetUserId();
-        await _fundsRepository.CreateDepositAsync(card, userId, userId);
-        
-        return Redirect("/");
     }
     
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public IActionResult CreateWithdrawal()
     {
         return View("CreateWithdrawal");
     } 
     
     [HttpPost]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public async Task<IActionResult> CreateWithdrawal(CardModel card)
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Error = "Validation error";
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
+            
+            ViewBag.Error = messages;
             return View("CreateWithdrawal");
         }
 
-        if (!IsCardValid(card))
+        try
         {
-            ViewBag.Error = "Validation error";
+            var userId = GetUserId();
+            await _fundsRepository.CreateWithdrawalAsync(card, userId, userId);
+            return Redirect("/");
+        }
+        catch (Exception e)
+        {
+            ViewBag.Error = e.Message;
             return View("CreateWithdrawal");
         }
-
-        var userId = GetUserId();
-        await _fundsRepository.CreateWithdrawalAsync(card, userId, userId);
-        
-        return Redirect("/");
     }
 
     [HttpGet]
-    [Authorize(Policy = "User")]
+    [Authorize(Policy = Roles.UserRole)]
     public async Task<IActionResult> UserFundTransfers()
     {
-        var userId = GetUserId();
-        var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(userId);
-        return View("UserFundTransfers", fundTransfers);
+        try
+        {
+            var userId = GetUserId();
+            var fundTransfers = await _fundsRepository.GetFundTransfersOfUser(userId).ToListAsync();
+            return View("UserFundTransfers", fundTransfers);   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
 
     [HttpGet]
-    [Authorize(Policy = "Funds-Manager")]
-    public async Task<IActionResult> UnverifiedFundTransfers()
+    [Authorize(Policy = Roles.FundsManagerRole)]
+    public async Task<IActionResult> UncheckedFundTransfers()
     {
-        var fundTransfers = await _fundsRepository.GetUnverifiedFundTransfers();
-        return View("UnverifiedFundTransfers", fundTransfers);
+        try
+        {
+            var fundTransfers = await _fundsRepository.GetUncheckedFundTransfers().ToListAsync();
+            return View("UncheckedFundTransfers", fundTransfers);   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpGet]
-    [Authorize(Roles = "Funds-Manager, Admin")]
-    public async Task<IActionResult> VerifiedFundTransfers()
+    [Authorize(Roles = $"{Roles.FundsManagerRole}, {Roles.AdminRole}")]
+    public async Task<IActionResult> AcceptedFundTransfers()
     {
-        var fundTransfers = await _fundsRepository.GetVerifiedFundTransfers();
-        return View("VerifiedFundTransfers", fundTransfers);
+        try
+        {
+            var fundTransfers = await _fundsRepository.GetAcceptedFundTransfers().ToListAsync();
+            return View("AcceptedFundTransfers", fundTransfers);   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpGet]
-    [Authorize(Policy = "Funds-Manager")]
+    [Authorize(Policy = Roles.FundsManagerRole)]
     public async Task<IActionResult> AcceptFundTransfer(int fundTransferId)
     {
-        var fundManagerId = GetUserId();
-        await _fundsRepository.AcceptFundTransfer(fundTransferId, fundManagerId);
-        return Redirect("/Funds/UnverifiedFundTransfers");
+        try
+        {
+            var fundManagerId = GetUserId();
+            await _fundsRepository.AcceptFundTransfer(fundTransferId, fundManagerId);
+            return Redirect("/Funds/UncheckedFundTransfers");
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
+
+            return View("Error", error);
+        }
     }
     
     [HttpGet]
-    [Authorize(Roles = "Funds-Manager, User")]
+    [Authorize(Roles = $"{Roles.FundsManagerRole}, {Roles.UserRole}")]
     public async Task<IActionResult> RejectFundTransfer(int fundTransferId)
     {
-        await _fundsRepository.DeleteFundTransferAsync(fundTransferId);
-        
-        var userRole = GetUserRole();
-        if (userRole == "Funds-Manager")
+        try
         {
-            return Redirect("/Funds/UnverifiedFundTransfers");   
-        }
+            await _fundsRepository.DeleteFundTransferAsync(fundTransferId);
+            var userRole = GetUserRole();
         
-        return Redirect("/Funds/UserFundTransfers");
-    }
-    
-    private bool IsCardValid(CardModel card)
-    {
-        var isValidCsv = int.TryParse(card.CardCvc, out var csv);
-        var isValidCardNumber = long.TryParse(card.CardNumber, out var cardNumber);
-        var isValidCardDate = int.TryParse(card.CardDate, out var cardDate);
-        var isValidAmountOfMoney = decimal.TryParse(card.CardNumber, out var amountOfMoney);
+            if (userRole == Roles.FundsManagerRole)
+            {
+                return Redirect("/Funds/UncheckedFundTransfers");   
+            }
+        
+            return Redirect("/Funds/UserFundTransfers");   
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorModel()
+            {
+                ErrorMessage = e.Message,
+            };
 
-        return isValidCsv && isValidCardDate && isValidCardNumber && isValidAmountOfMoney;
+            return View("Error", error);
+        }
     }
-    
+
     private int GetUserId()
     {
         Int32.TryParse(HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value, out var id);

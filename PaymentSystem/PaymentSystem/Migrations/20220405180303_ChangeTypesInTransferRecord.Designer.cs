@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PaymentSystem.Data;
@@ -11,9 +12,10 @@ using PaymentSystem.Data;
 namespace PaymentSystem.Migrations
 {
     [DbContext(typeof(PaymentSystemContext))]
-    partial class PaymentSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20220405180303_ChangeTypesInTransferRecord")]
+    partial class ChangeTypesInTransferRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,19 +59,16 @@ namespace PaymentSystem.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("amount_of_money");
 
-                    b.Property<string>("CardCvc")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<int>("CardCvc")
+                        .HasColumnType("integer")
                         .HasColumnName("card_cvc");
 
-                    b.Property<string>("CardDate")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<int>("CardDate")
+                        .HasColumnType("integer")
                         .HasColumnName("card_date");
 
-                    b.Property<string>("CardNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<long>("CardNumber")
+                        .HasColumnType("bigint")
                         .HasColumnName("card_number");
 
                     b.Property<DateTime?>("ConfirmedAt")
@@ -207,7 +206,7 @@ namespace PaymentSystem.Migrations
                             IsVerified = false,
                             LastName = "admin",
                             Password = "admin1234",
-                            RegisteredAt = new DateTime(2022, 4, 8, 9, 52, 0, 437, DateTimeKind.Utc).AddTicks(6707)
+                            RegisteredAt = new DateTime(2022, 4, 5, 18, 3, 3, 239, DateTimeKind.Utc).AddTicks(5807)
                         });
                 });
 

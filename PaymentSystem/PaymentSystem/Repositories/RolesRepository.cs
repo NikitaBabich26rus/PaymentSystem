@@ -18,23 +18,40 @@ public class RolesRepository: IRolesRepository
         await _paymentSystemContext.SaveChangesAsync();
     }
 
-    public async ValueTask<string> GetUserRolesAsync(int userId)
+    public async ValueTask<string> GetUserRoleAsync(int userId)
     {
         var userRole = await _paymentSystemContext.UserRoles
-            .FirstOrDefaultAsync(x => x.UserId == userId);
+            .SingleOrDefaultAsync(x => x.UserId == userId);
+
+        if (userRole == null)
+        {
+            throw new NullReferenceException($"No role was found for the user.");
+        }
+        
         var role = await _paymentSystemContext.Roles
-            .FirstOrDefaultAsync(x => x.Id == userRole!.RoleId);
-        return role!.Name;
+            .SingleOrDefaultAsync(x => x.Id == userRole.RoleId);
+
+        if (role == null)
+        {
+            throw new NullReferenceException($"No role was found for the user.");
+        }
+        
+        return role.Name;
     }
 
-    public async Task UpdateUserRoleAsync(string roleName, int userId)
+    public async Task UpdateUserRoleAsync(int userId, string roleName)
     {
-        var roles = await GetRolesAsync();
+        var roles = await GetRolesAsync().ToListAsync();
         var userRoleRecord = await _paymentSystemContext.UserRoles
             .Include(x => x.RoleRecord)
             .FirstOrDefaultAsync(x => x.UserId == userId);
+
+        if (userRoleRecord == null)
+        {
+            throw new ArgumentException("User role not found for update.");
+        }
         
-        if (userRoleRecord!.RoleRecord.Name != roleName)
+        if (userRoleRecord.RoleRecord.Name != roleName)
         {
             roles.ForEach(r =>
             {
@@ -48,7 +65,7 @@ public class RolesRepository: IRolesRepository
         }
     }
 
-    public async ValueTask<List<RoleRecord>> GetRolesAsync()
-        => await _paymentSystemContext.Roles.ToListAsync();
+    public IQueryable<RoleRecord> GetRolesAsync()
+        => _paymentSystemContext.Roles;
     
 }

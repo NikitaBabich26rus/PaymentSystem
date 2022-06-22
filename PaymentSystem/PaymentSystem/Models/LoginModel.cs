@@ -4,11 +4,13 @@ namespace PaymentSystem.Models;
 
 public class LoginModel
 {
-    [Required(ErrorMessage = "Не указан Email")]
-    [RegularExpression(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}", ErrorMessage = "Некорректный адрес")]
+    [Required(ErrorMessage = "No email listed.")]
+    [MaxLength(50)]
+    [DataType(DataType.EmailAddress, ErrorMessage = "Incorrect email.")]
     public string Email { get; set; }
          
-    [Required(ErrorMessage = "Не указан пароль")]
+    [Required(ErrorMessage = "No password listed.")]
     [DataType(DataType.Password)]
+    [StringLength(30, MinimumLength = 6)]
     public string Password { get; set; }
 }

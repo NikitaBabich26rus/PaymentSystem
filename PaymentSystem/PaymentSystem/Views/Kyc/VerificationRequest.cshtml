@@ -1,4 +1,4 @@
-@model PaymentSystem.Data.VerificationTransferRecord
+@model PaymentSystem.Data.VerificationRecord
 
 
 <div style="margin-top: 50px">
@@ -19,8 +19,8 @@
                 <form
                     class="d-flex flex-column"
                     method="post"
-                    asp-controller="Account"
-                    asp-action="VerifyUser"
+                    asp-controller="Kyc"
+                    asp-action="SendVerificationRequest"
                 >
                     @if (@ViewBag.Error != null)
                     {

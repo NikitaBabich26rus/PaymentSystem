@@ -4,15 +4,15 @@ namespace PaymentSystem.Repositories;
 
 public interface IVerificationRepository
 {
-    Task VerifyUserAsync(int userId, string passportData);
+    Task SendVerificationRequestAsync(int userId, string passportData);
 
-    ValueTask<VerificationTransferRecord?> GetVerificationByUserIdAsync(int userId);
+    ValueTask<VerificationRecord?> GetVerificationRequestByUserIdAsync(int userId);
 
-    ValueTask<List<VerificationTransferRecord>> GetVerifyUsersAsync();
+    IQueryable<VerificationRecord> GetVerificationRequestsAsync();
 
-    ValueTask<List<VerificationTransferRecord>> GetVerifiedUsers();
+    IQueryable<VerificationRecord> GetAcceptedRequestsForVerificationAsync();
 
     Task AcceptUserVerificationAsync(int verificationId, int kycManagerId);
 
-    Task RejectUserVerificationAsync(int verificationId);
+    Task RejectUserVerificationRequestAsync(int verificationId);
 }

@@ -30,60 +30,84 @@ public class AuthController: Controller
     }
     
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginModel loginModel)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var user = await _accountService.GetUserByEmailAsync(loginModel.Email);
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
             
-            if (user == null)
-            {
-                ViewBag.Error = "Error email";
-                return View("Login");
-            }
+            ViewBag.Error = messages;
+            return View("Login");
+        }
+        
+        var user = await _accountService.GetUserByEmailAsync(loginModel.Email);
             
-            if (user.IsBlocked)
-            {
-                ViewBag.Error = "Account is blocked";
-                return View("Login");
-            }
+        if (user == null)
+        {
+            ViewBag.Error = "Error email";
+            return View("Login");
+        }
+            
+        if (user.IsBlocked)
+        {
+            ViewBag.Error = "Account is blocked";
+            return View("Login");
+        }
 
-            if (String.CompareOrdinal(user.Password, loginModel.Password) != 0)
-            {
-                ViewBag.Error = "Error password";
-                return View("Login");
-            }
-            
-            var userRole = await _rolesRepository.GetUserRolesAsync(user.Id);
+        if (String.CompareOrdinal(user.Password, loginModel.Password) != 0)
+        {
+            ViewBag.Error = "Error password";
+            return View("Login");
+        }
+
+        try
+        {
+            var userRole = await _rolesRepository.GetUserRoleAsync(user.Id);
             await AddCookie(user.Id, userRole);
             return Redirect("/");
         }
-        
-        ViewBag.Error = "Error email or password";
-        return View("Login");
+        catch (Exception)
+        {
+            ViewBag.Error = "Sign in error, contact support please.";
+            return View("Login");
+        }
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterModel registerModel)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var user = await _accountService.GetUserByEmailAsync(registerModel.Email);
-            if (user != null)
-            {
-                ViewBag.Error = "Email is used";
-                return View("Register");
-            }
+            var messages = string.Join(" ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(x => x.ErrorMessage));
             
+            ViewBag.Error = messages;
+            return View("Register");
+        }
+        
+        var user = await _accountService.GetUserByEmailAsync(registerModel.Email);
+        
+        if (user != null)
+        {
+            ViewBag.Error = "Email is used";
+            return View("Register");
+        }
+
+        try
+        {
             var userId = await _accountService.CreateUserAsync(registerModel);
-            var userRole = await _rolesRepository.GetUserRolesAsync(userId);
+            var userRole = await _rolesRepository.GetUserRoleAsync(userId);
             await AddCookie(userId, userRole);
             return Redirect("/");
         }
-        ViewBag.Error = "Validation error";
-        return View("Register");
+        catch (Exception)
+        {
+            ViewBag.Error = "Sign up error, contact support please.";
+            return View("Register");
+        }
     }
     
     [Authorize]
@@ -103,6 +127,7 @@ public class AuthController: Controller
             new Claim(ClaimTypes.Sid, userId.ToString()),
             new Claim(ClaimTypes.Role, userRole)
         };
+        
         var id = new ClaimsIdentity(claims, "Cookie");
         await HttpContext.SignInAsync("Cookie", new ClaimsPrincipal(id));
     }

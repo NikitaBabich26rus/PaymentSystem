@@ -25,7 +25,7 @@ namespace PaymentSystem.Data
         [Required]
         public string CardCvc { get; set; }
         
-        [Column("user_date")]
+        [Column("card_date")]
         [Required]
         public string CardDate { get; set; }
         

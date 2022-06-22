@@ -6,9 +6,9 @@ public interface IRolesRepository
 {
     Task AddUserRolesAsync(UserRoleRecord userRoleRecord);
 
-    ValueTask<string> GetUserRolesAsync(int userId);
+    ValueTask<string> GetUserRoleAsync(int userId);
 
-    ValueTask<List<RoleRecord>> GetRolesAsync();
+    IQueryable<RoleRecord> GetRolesAsync();
 
-    Task UpdateUserRoleAsync(string roleName, int userId);
+    Task UpdateUserRoleAsync(int userId, string roleName);
 }
